@@ -18,8 +18,8 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
   TextEditingController birthdayController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
   TextEditingController addressController = TextEditingController();
-  TextEditingController passwdController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
 
@@ -44,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
     emailController.dispose();
     fullNameController.dispose();
     birthdayController.dispose();
-    passwdController.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
@@ -115,7 +115,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                 ),
                 _buildFormField(
-                  controller: addressController,
+                  controller: phoneController,
                   hintText: "masukkan nomor telepon anda",
                   labelText: "Nomor Telepon",
                   keyboardType: TextInputType.number,

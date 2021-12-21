@@ -9,12 +9,14 @@ class AppRoute {
   static const logout = "/logout";
   static const forgotPassword = "/forgot_password";
   static const verifyForgotPassword = "/verify_forgot_password";
+  static const homeMenuItemPage = "/home_menu_item_page";
 }
 
 ///
 ///Routing ke halaman yang di tuju.
-navigateTo(String routeName) => locator<NavigationService>().navigateTo(
+navigateTo(String routeName, {Object? arguments}) => locator<NavigationService>().navigateTo(
       routeName,
+      arguments: arguments,
     );
 
 ///Menghapus halaman sebelumnya
@@ -31,4 +33,4 @@ navigateAndReplace(String routeName) => locator<NavigationService>().moveTo(
     );
 
 ///Routing ke halaman sebelumnya.
-goBack(String routeName) => locator<NavigationService>().goBack();
+goBack() => locator<NavigationService>().goBack();

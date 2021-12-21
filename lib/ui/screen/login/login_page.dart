@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/ui/widget/build_body_widget.dart';
@@ -27,7 +26,9 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return BuildBodyWidget(
-      body: _buildBody(context),
+      body: SingleChildScrollView(
+        child: _buildBody(context),
+      ),
     );
   }
 

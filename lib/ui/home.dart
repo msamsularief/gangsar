@@ -22,11 +22,8 @@ class Home extends StatelessWidget {
         if (activeTab == AppTab.home) {
           body = const HomePage();
         } else {
-          body = SizedBox(
-            height: Core.getDefaultBodyHeight(context),
-            child: Center(
-              child: Text("This Is Body of ${activeTab.toString()}"),
-            ),
+          body = Center(
+            child: Text("This Is Body of ${activeTab.toString()}"),
           );
         }
         return BuildBodyWidget(

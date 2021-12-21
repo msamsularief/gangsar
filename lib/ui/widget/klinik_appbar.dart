@@ -12,6 +12,7 @@ class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool automaticallyImplyLeading;
   final bool shadow;
   final double titleSpacing;
+  final Color? leadingButtonColor;
 
   @override
   final Size preferredSize = Size.fromHeight(AppBar().preferredSize.height);
@@ -27,6 +28,7 @@ class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.automaticallyImplyLeading = true,
     this.shadow = true,
     this.titleSpacing = NavigationToolbar.kMiddleSpacing,
+    this.leadingButtonColor,
   }) : super(key: key);
 
   @override
@@ -51,7 +53,23 @@ class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: AppBar(
         actions: children,
         bottom: bottom,
-        leading: leading,
+        leading: leading == null && automaticallyImplyLeading == true
+            ? TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (states) => Colors.transparent),
+                ),
+                child: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: leadingButtonColor ?? Colors.white,
+                ),
+              )
+            : leading == null && automaticallyImplyLeading == false
+                ? leading
+                : leading,
         backgroundColor: Colors.transparent,
         elevation: 0.0,
         primary: false,

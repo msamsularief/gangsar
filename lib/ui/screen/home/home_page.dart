@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
+import 'package:klinik/core/image_initial.dart';
 import 'package:klinik/ui/widget/custom_button.dart';
 import 'package:klinik/ui/widget/slider_widget.dart';
 
@@ -8,27 +10,23 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: Core.getDefaultBodyHeight(context),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        physics: const ClampingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildMenu(context),
-            _sizedBox(),
-            _text(
-              "Update Informasi",
-              fontSize: 24.0,
-            ),
-            _sizedBox(height: 12.0),
-            const SliderWidget(),
-            Container(
-              height: 100.0,
-            ),
-          ],
-        ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20.0),
+      physics: const ClampingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildMenu(context),
+          _sizedBox(),
+          _text(
+            "Update Informasi",
+            fontSize: 24.0,
+          ),
+          _sizedBox(height: 12.0),
+          const SliderWidget(
+            imageCacheInitialName: ImageInitial.informationsImage,
+          ),
+        ],
       ),
     );
   }
@@ -46,7 +44,9 @@ class HomePage extends StatelessWidget {
         return Column(
           children: [
             CustomButton.defaultButton(
-              onPressed: () {},
+              onPressed: () {
+                navigateTo(AppRoute.homeMenuItemPage, arguments: label);
+              },
               title: label,
               titleSize: 18.0,
               titleColor: Theme.of(context).primaryColor,
@@ -63,18 +63,14 @@ class HomePage extends StatelessWidget {
 
   Widget _text(
     String? text, {
-    TextAlign? textAlign,
     double? fontSize,
-    FontWeight? fontWeight,
-    Color? color,
   }) =>
       Text(
         "$text",
-        textAlign: textAlign ?? TextAlign.left,
+        textAlign: TextAlign.left,
         style: TextStyle(
-          color: color ?? Colors.white,
           fontSize: fontSize ?? 18.0,
-          fontWeight: fontWeight ?? FontWeight.normal,
+          color: Colors.white,
         ),
       );
 

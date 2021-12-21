@@ -5,10 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:klinik/bloc/tab/tab_bloc.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/ui/home.dart';
+import 'package:klinik/ui/screen/bumil/home_menu_item_page.dart';
 import 'package:klinik/ui/screen/forgot_password/forgot_password.dart';
 import 'package:klinik/ui/screen/forgot_password/verify_forgot_password.dart';
 import 'package:klinik/ui/screen/login/login_page.dart';
 import 'package:klinik/ui/screen/register/register_page.dart';
+import 'package:klinik/ui/widget/video_player/video_list_widget.dart';
+import 'package:klinik/ui/widget/video_player/video_player.dart';
 
 class RouterGenerator {
   static Route<dynamic>? generateRoute(
@@ -38,6 +41,20 @@ class RouterGenerator {
       case AppRoute.verifyForgotPassword:
         return MaterialPageRoute(
           builder: (context) => const VerifyForgotPasswordPage(),
+        );
+      case AppRoute.homeMenuItemPage:
+        String title = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (context) => HomeMenuItemPage(
+            title: title,
+          ),
+        );
+      case "/video_player":
+        String videoId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (context) => VideoPlayer(
+            videoId: videoId,
+          ),
         );
 
       default:

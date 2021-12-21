@@ -1,16 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:klinik/helper/color_helper.dart';
 import 'package:klinik/ui/screen/login/login_page.dart';
 import 'package:klinik/utils/locator.dart';
 import 'package:klinik/utils/nav_service.dart';
 import 'package:klinik/utils/router_generator.dart';
-import 'package:path_provider/path_provider.dart';
-
-late Directory myTemporaryDirectory;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +14,9 @@ Future<void> main() async {
   KlinikSystemChrome.uiOverlayStyle;
   await initializeDateFormatting('id_ID', null).then((_) => true);
 
-  myTemporaryDirectory = await getApplicationDocumentsDirectory();
+  await Future.delayed(const Duration(milliseconds: 0), () {
+    DefaultCacheManager().emptyCache();
+  });
 
   setupLocator();
 
@@ -51,6 +49,7 @@ extension KlinikSystemChrome on SystemChrome {
   static get uiOverlayStyle => SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
+          systemStatusBarContrastEnforced: true,
         ),
       );
 }
@@ -64,8 +63,6 @@ class KlinikTheme {
       letterSpacing: 0.4,
       wordSpacing: 0.0,
     );
-
-    // final buttonTheme =
 
     return ThemeData.light().copyWith(
       platform: TargetPlatform.android,

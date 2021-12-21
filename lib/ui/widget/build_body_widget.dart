@@ -8,7 +8,7 @@ import 'package:klinik/ui/widget/klinik_appbar.dart';
 ///Usahakan ini dijadikan Default ketika membuat Tampilan Baru.
 ///Jika ada yang kurang, bisa ditambahkan sesuai dengan fungsi yang dibutuhkan.
 class BuildBodyWidget extends StatelessWidget {
-  final Widget? body;
+  final Widget body;
   final KlinikAppBar? appBar;
   final Widget? floatingActionButton;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
@@ -36,8 +36,9 @@ class BuildBodyWidget extends StatelessWidget {
         children: [
           Positioned(
             height: Core.getDefaultAppHeight(context),
+            width: Core.getDefaultAppWidth(context),
             child: Container(
-              width: Core.getDefaultAppWidth(context),
+              // width: Core.getDefaultAppWidth(context),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -57,10 +58,16 @@ class BuildBodyWidget extends StatelessWidget {
             ),
           ),
           Positioned(
-            child: SizedBox(
-              height: Core.getDefaultAppHeight(context),
-              child: body,
-            ),
+            height: Core.getDefaultAppHeight(context),
+            width: Core.getDefaultAppWidth(context),
+            child: appBar != null
+                ? SafeArea(
+                    child: SizedBox(
+                      height: Core.getDefaultBodyHeight(context),
+                      child: body,
+                    ),
+                  )
+                : body,
           ),
         ],
       ),

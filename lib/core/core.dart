@@ -15,6 +15,16 @@ class Core {
     return width;
   }
 
+  ///GET defaultAppBarHeight
+  static getDefaultAppBarHeight(BuildContext context) {
+    // final height =
+    //     AppBar().preferredSize.height + MediaQuery.of(context).padding.top;
+
+    final height = AppBar().preferredSize.height;
+
+    return height;
+  }
+
   ///GET default app body height
   static getDefaultBodyHeight(BuildContext context) {
     final height =
