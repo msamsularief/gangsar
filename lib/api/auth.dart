@@ -78,50 +78,67 @@ class Auth {
     String fullName,
     String phoneNum,
   ) async {
-    Account? account;
     AuthorizeResult? result;
     String? errorMessage = "";
 
     try {
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+      UserCredential? userCredential =
+          await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
+      print("USER CREDENTIAL : $userCredential");
+
       User? user = userCredential.user;
-      if (user != null) {
-        await userCredential.user!.updateDisplayName(fullName);
-        await auth.verifyPhoneNumber(
-          phoneNumber: phoneNum,
-          verificationCompleted: (PhoneAuthCredential credential) {},
-          verificationFailed: (FirebaseAuthException e) {},
-          codeSent: (String verificationId, int? resendToken) {},
-          codeAutoRetrievalTimeout: (String verificationId) {},
-        );
 
-        await userCredential.user!.reload();
+      // if (user != null) {
+      await user!.updateDisplayName(fullName);
+      await auth.verifyPhoneNumber(
+        phoneNumber: phoneNum,
+        verificationCompleted: (PhoneAuthCredential credential) {},
+        verificationFailed: (FirebaseAuthException e) {},
+        codeSent: (String verificationId, int? resendToken) {},
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
 
-        user.sendEmailVerification();
+      await user.reload();
 
-        result?.message = 'Register Success';
-      } else {
-        return result;
-      }
+      user.sendEmailVerification();
+
+      // result?.message = 'Register Success';
+
+      // print("\n\n\nAUTH RESULT MESSAGE : ${result?.message}\n\n\n");
+      return AuthorizeResult(message: 'Register Success');
+      // }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         errorMessage = 'The password provided is too weak.';
-        throw AuthorizeResult(message: errorMessage);
+        return AuthorizeResult(message: errorMessage);
+        // print(errorMessage);
+        // result?.message = errorMessage;
+        // return result;
       } else if (e.code == 'email-already-in-use') {
         errorMessage = 'The account already exists for that email.';
+        print(errorMessage);
+        result?.message = errorMessage;
+        // return result;
 
-        throw AuthorizeResult(message: errorMessage);
+        return AuthorizeResult(message: errorMessage);
+      } else {
+        errorMessage = e.message;
+        print(errorMessage);
+        result?.message = errorMessage;
+        // return result;
+        return AuthorizeResult(message: errorMessage);
       }
     } catch (e) {
       print('CATCHED : $e');
       errorMessage = e.toString();
-      throw AuthorizeResult(message: errorMessage);
+      result?.message = errorMessage;
+      return AuthorizeResult(message: errorMessage);
     }
-    print(result!.message);
-    return result;
+    // result?.message = 'cannot get User data from server !';
+    // return result;
   }
 }

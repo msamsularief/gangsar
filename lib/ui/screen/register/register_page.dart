@@ -63,15 +63,14 @@ class _RegisterPageState extends State<RegisterPage> {
       body: BlocListener<RegisterBloc, RegisterState>(
         listener: (context, state) {
           if (state is RegisterLoading) {
-            isLoading = !isLoading;
-          }
-          if (state is RegisterSuccess) {
-            navigateAndReplace(AppRoute.login);
-          }
-          if (state is RegisterFailure) {
+            isLoading = true;
+          } else if (state is RegisterFailure) {
             isLoading = false;
 
             FlashBar.showError(context, message: state.error);
+          } else if (state is RegisterSuccess) {
+            FlashBar.showOnSucess(context, message: state.message!);
+            navigateAndReplace(AppRoute.login);
           }
         },
         child: _buildBody(context, registerBloc),
