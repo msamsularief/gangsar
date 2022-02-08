@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/core/image_initial.dart';
+import 'package:klinik/helper/color_helper.dart';
 import 'package:klinik/ui/widget/custom_button.dart';
 import 'package:klinik/ui/widget/slider_widget.dart';
 
@@ -10,9 +11,14 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20.0),
-      physics: const ClampingScrollPhysics(),
+    return Container(
+      padding: const EdgeInsets.only(
+        top: 20.0,
+        bottom: 20.0,
+        left: 20.0,
+        right: 20.0,
+      ),
+      // physics: ClampingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -32,7 +38,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildMenu(BuildContext context) {
-    List<String> items = ["Bumil", "Busui", "Promil"];
+    List<String> items = ["Ibu Hamil", "Ibu dan Anak", "Persiapan Kehamilan"];
 
     return ListView.builder(
       itemCount: items.length,
@@ -50,6 +56,7 @@ class HomePage extends StatelessWidget {
               title: label,
               titleSize: 18.0,
               titleColor: Theme.of(context).primaryColor,
+              buttonDefaultColor: Colors.white,
               titleFontWeight: FontWeight.bold,
               width: Core.getDefaultAppWidth(context),
               height: 60.0,
@@ -70,7 +77,7 @@ class HomePage extends StatelessWidget {
         textAlign: TextAlign.left,
         style: TextStyle(
           fontSize: fontSize ?? 18.0,
-          color: Colors.white,
+          color: ColorHelper.fromHex("#240B1D"),
         ),
       );
 

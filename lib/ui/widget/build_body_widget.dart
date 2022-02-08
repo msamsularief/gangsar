@@ -1,7 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/helper/color_helper.dart';
-import 'package:klinik/ui/widget/klinik_appbar.dart';
 
 ///Create a Scaffold with Gradient background.
 ///
@@ -9,29 +9,41 @@ import 'package:klinik/ui/widget/klinik_appbar.dart';
 ///Jika ada yang kurang, bisa ditambahkan sesuai dengan fungsi yang dibutuhkan.
 class BuildBodyWidget extends StatelessWidget {
   final Widget body;
-  final KlinikAppBar? appBar;
+
+  ///GUNAKAN `KlinikAppBar()` WIDGET !!!
+  final PreferredSizeWidget? appBar;
   final Widget? floatingActionButton;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
+  final Widget? drawer;
+  final Widget? endDrawer;
 
   ///Default value is False.
   final bool swipeBackgroudColors;
-  const BuildBodyWidget({
+  BuildBodyWidget({
     Key? key,
     required this.body,
     this.appBar,
     this.swipeBackgroudColors = false,
     this.floatingActionButton,
     this.floatingActionButtonLocation,
+    this.drawer,
+    this.endDrawer,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: key,
       appBar: appBar,
       backgroundColor: Colors.white,
       floatingActionButton: floatingActionButton,
       floatingActionButtonLocation: floatingActionButtonLocation,
       extendBodyBehindAppBar: true,
+      drawer: drawer,
+      endDrawer: endDrawer,
+      drawerDragStartBehavior: DragStartBehavior.start,
+      drawerEnableOpenDragGesture: false,
+      endDrawerEnableOpenDragGesture: false,
       body: Stack(
         children: [
           Positioned(
@@ -42,10 +54,13 @@ class BuildBodyWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    ColorHelper.fromHex("#FFE65100"),
-                    ColorHelper.fromHex("#FFE65100"),
+                    ColorHelper.fromHex("#FF9CEE").withOpacity(0.4),
+                    // ColorHelper.fromHex("#FFE65100"),
+                    // ColorHelper.fromHex("#FFE65100"),
                     // Colors.orangeAccent.shade400,
-                    ColorHelper.fromHex("#FFFF9100"),
+                    ColorHelper.fromHex("#FF9CEE").withOpacity(0.2),
+                    ColorHelper.fromHex("#FF9CEE").withOpacity(0.06),
+                    ColorHelper.fromHex("#FF9CEE").withOpacity(0.02),
                   ],
                   begin: swipeBackgroudColors
                       ? Alignment.bottomCenter
@@ -57,17 +72,27 @@ class BuildBodyWidget extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            height: Core.getDefaultAppHeight(context),
-            width: Core.getDefaultAppWidth(context),
+          SafeArea(
             child: appBar != null
-                ? SafeArea(
-                    child: SizedBox(
-                      height: Core.getDefaultBodyHeight(context),
+                ? Container(
+                    height: Core.getDefaultAppHeight(context),
+                    width: Core.getDefaultAppWidth(context),
+                    color: Colors.transparent,
+                    alignment: Alignment.topCenter,
+                    child: SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
                       child: body,
                     ),
                   )
-                : body,
+                : Container(
+                    height: Core.getDefaultAppHeight(context),
+                    width: Core.getDefaultAppWidth(context),
+                    color: Colors.transparent,
+                    child: SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: body,
+                    ),
+                  ),
           ),
         ],
       ),

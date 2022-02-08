@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 class CustomFormField extends StatelessWidget {
   final TextEditingController? controller;
   final VoidCallback? onEditingComplete;
+  final TextCapitalization? textCapitalization;
   final bool obscureText;
   final bool readOnly;
   final String? hintText;
@@ -16,13 +17,17 @@ class CustomFormField extends StatelessWidget {
   final TextStyle? hintStyle;
   final TextInputType? keyboardType;
   final int? maxLength;
-  final List<TextInputFormatter>? inputFormater;
+  final List<TextInputFormatter>? inputFormaters;
   final double? latterSpacing;
   final String? Function(String?)? validator;
   final TextInputAction? textInputAction;
   final String? value;
   final int? maxLines;
   final VoidCallback? onTap;
+  final FocusNode? focusNode;
+  final Function(String)? onFieldSubmitted;
+  final Function(String?)? onSaved;
+  final bool autoFocus;
 
   const CustomFormField({
     Key? key,
@@ -33,9 +38,10 @@ class CustomFormField extends StatelessWidget {
     this.labelText,
     this.textAlign,
     this.style,
+    this.textCapitalization,
     this.keyboardType,
     this.maxLength,
-    this.inputFormater,
+    this.inputFormaters,
     this.suffixIcon,
     this.icon,
     this.latterSpacing,
@@ -46,15 +52,31 @@ class CustomFormField extends StatelessWidget {
     this.value,
     this.maxLines,
     this.onTap,
+    this.focusNode,
+    this.onFieldSubmitted,
+    this.onSaved,
+    this.autoFocus = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       onEditingComplete: onEditingComplete,
+      onFieldSubmitted: onFieldSubmitted,
+      onSaved: onSaved,
       onTap: onTap,
       validator: validator,
       controller: controller,
+      focusNode: focusNode,
+      autofocus: autoFocus,
+      showCursor: true,
+      textCapitalization: textCapitalization ?? TextCapitalization.sentences,
+      toolbarOptions: ToolbarOptions(
+        copy: true,
+        cut: true,
+        paste: true,
+        selectAll: true,
+      ),
       style: style ??
           TextStyle(
             fontSize: 16,
@@ -66,7 +88,7 @@ class CustomFormField extends StatelessWidget {
       obscuringCharacter: '*',
       keyboardType: keyboardType ?? TextInputType.text,
       maxLength: maxLength,
-      inputFormatters: inputFormater,
+      inputFormatters: inputFormaters,
       textInputAction: textInputAction ?? TextInputAction.done,
       enableInteractiveSelection: true,
       maxLines: maxLines ?? 1,
@@ -98,7 +120,7 @@ class CustomFormField extends StatelessWidget {
         ),
         border: _inputBorder(),
         focusedBorder: _inputBorder(
-          color: Colors.orangeAccent.shade700.withOpacity(0.5),
+          color: Theme.of(context).primaryColor.withOpacity(0.3),
         ),
         disabledBorder: _inputBorder(),
         enabledBorder: _inputBorder(),

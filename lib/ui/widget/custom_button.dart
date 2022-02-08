@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:klinik/helper/color_helper.dart';
 
 extension CustomButton on TextButton {
-  static defaultButton({
+  static Widget defaultButton({
     required final String title,
     final double? titleSize,
     final Color? titleColor,
@@ -15,7 +16,9 @@ extension CustomButton on TextButton {
     final double? width,
     final EdgeInsetsGeometry? margin,
     final EdgeInsetsGeometry? padding,
+    final EdgeInsetsGeometry? textPadding,
     final bool? toUpperCaseTitle = true,
+    final FocusNode? focusNode,
   }) {
     return Container(
       margin: margin,
@@ -25,14 +28,18 @@ extension CustomButton on TextButton {
       child: ButtonTheme(
         child: TextButton(
           onPressed: onPressed,
-          child: Text(
-            toUpperCaseTitle! ? title.toUpperCase() : title,
-            style: TextStyle(
-              color: titleColor,
-              fontSize: titleSize,
-              fontWeight: titleFontWeight ?? FontWeight.w600,
+          focusNode: focusNode,
+          child: Padding(
+            padding: textPadding ?? EdgeInsets.zero,
+            child: Text(
+              toUpperCaseTitle! ? title.toUpperCase() : title,
+              style: TextStyle(
+                color: titleColor,
+                fontSize: titleSize,
+                fontWeight: titleFontWeight ?? FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
           style: TextButton.styleFrom(
             shape: RoundedRectangleBorder(
@@ -43,14 +50,15 @@ extension CustomButton on TextButton {
                 style: borderStyle!,
               ),
             ),
-            backgroundColor: buttonDefaultColor,
+            backgroundColor:
+                buttonDefaultColor ?? ColorHelper.fromHex("#D6009A"),
           ),
         ),
       ),
     );
   }
 
-  static circularButton({
+  static Widget circularButton({
     required final String title,
     final Color? titleColor,
     final double? titleSize,
@@ -98,7 +106,7 @@ extension CustomButton on TextButton {
     );
   }
 
-  static loadingButton({
+  static Widget loadingButton({
     final Color? buttonColor,
     final Color? buttonBorderColor,
     final Color? loadingColor,

@@ -1,57 +1,68 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/core/image_initial.dart';
 import 'package:klinik/helper/video_helper.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:klinik/model/video.dart';
+import 'package:klinik/bloc/video/video.dart';
 
 class VideoListWidget extends StatelessWidget {
-  final double height;
+  final double? imageHeight;
   final List<String> videoUrls;
   final ImageInitial imageCacheInitialName;
-  const VideoListWidget({
+  VideoListWidget({
     Key? key,
-    required this.height,
     required this.videoUrls,
     required this.imageCacheInitialName,
+    this.imageHeight,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    double height = 0.0;
+    if (imageHeight == null) {
+      height = Core.getDefaultAppBarHeight(context) * 1.8;
+    }
+
     return SizedBox(
       height: height,
       child: ListView(
         shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         children: [
-          _buildList(context),
-          Container(
-            margin: const EdgeInsets.only(right: 4.0),
-            padding: const EdgeInsets.all(4.0),
-            height: height,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
-              color: Colors.white,
+          _buildList(context, height),
+          GestureDetector(
+            onTap: () => navigateTo(
+              AppRoute.videos,
             ),
-            width: Core.getDefaultAppWidth(context) / 3,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "See More",
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 18.0,
+            child: Container(
+              padding: const EdgeInsets.all(4.0),
+              height: height,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.0),
+                color: Colors.white,
+              ),
+              width: Core.getDefaultAppWidth(context) / 3,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "See More",
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontSize: 18.0,
+                    ),
                   ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: Theme.of(context).primaryColor,
-                ),
-              ],
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -59,29 +70,84 @@ class VideoListWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildList(BuildContext context) {
+  Widget _buildList(BuildContext context, double height) {
+    List<String> urls = [];
+
+    if (videoUrls.length > 5) {
+      for (var i = 0; i <= 4; i++) {
+        urls.add(videoUrls[i]);
+      }
+    }
+
+    Video? video;
+
+    final _loading = Container(
+      height: Core.getDefaultBodyHeight(context) / 3,
+      width: Core.getDefaultAppWidth(context),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      margin: EdgeInsets.only(bottom: 20.0),
+      child: Center(
+        child: CircularProgressIndicator(
+          backgroundColor: Colors.white30,
+          color: Theme.of(context).primaryColor.withOpacity(0.4),
+          valueColor: AlwaysStoppedAnimation(
+            Theme.of(context).primaryColor,
+          ),
+        ),
+      ),
+    );
+
     return ListView.builder(
-      itemCount: videoUrls.length,
+      itemCount: urls.length,
       shrinkWrap: true,
       scrollDirection: Axis.horizontal,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
         String videoThumbnail = VideoHelper.getVideoThumbnail(
-          videoUrls[index],
+          urls[index],
         );
 
-        String? videoId = YoutubePlayer.convertUrlToId(videoUrls[index]);
+        String? videoId = VideoHelper.getVideoId(urls[index]);
 
-        return GestureDetector(
-          onTap: () {
-            print("VIDEO ID : $videoId");
-            navigateTo("/video_player", arguments: videoId!);
-            // }
-          },
-          child: _imageBuilder(
-            context,
-            videoThumbnail,
-            index,
+        return BlocProvider(
+          create: (context) => VideoBloc()..add(GetVideoDetail(urls[index])),
+          child: BlocBuilder<VideoBloc, VideoState>(
+            builder: (context, state) {
+              if (state is VideoLoading) {
+                return _loading;
+              } else if (state is VideoLoaded) {
+                video = state.item;
+              }
+
+              if (video != null) {
+                return GestureDetector(
+                  onTap: () {
+                    navigateTo("/video_player", arguments: [
+                      videoId,
+                      Video(video!.title, video!.author),
+                    ]);
+                  },
+                  child: _imageBuilder(
+                    context,
+                    videoThumbnail,
+                    index,
+                    height,
+                  ),
+                );
+              } else {
+                return Container(
+                  height: Core.getDefaultBodyHeight(context) / 3,
+                  width: Core.getDefaultAppWidth(context),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                );
+              }
+            },
           ),
         );
       },
@@ -92,6 +158,7 @@ class VideoListWidget extends StatelessWidget {
     BuildContext context,
     String videoThumbnail,
     int index,
+    double height,
   ) =>
       CachedNetworkImage(
         imageUrl: videoThumbnail,

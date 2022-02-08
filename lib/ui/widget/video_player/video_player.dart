@@ -1,14 +1,15 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:klinik/model/video.dart';
 import 'package:klinik/ui/widget/build_body_widget.dart';
 import 'package:klinik/ui/widget/klinik_appbar.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class VideoPlayer extends StatefulWidget {
   final String videoId;
-  const VideoPlayer({Key? key, required this.videoId}) : super(key: key);
+  final Video videoData;
+  VideoPlayer({Key? key, required this.videoId, required this.videoData})
+      : super(key: key);
 
   @override
   _VideoPlayerState createState() => _VideoPlayerState();
@@ -17,57 +18,99 @@ class VideoPlayer extends StatefulWidget {
 class _VideoPlayerState extends State<VideoPlayer>
     with TickerProviderStateMixin {
   late YoutubePlayerController _controller;
-  late PlayerState _playerState;
-  late YoutubeMetaData _videoMetaData;
-  late AnimationController _animController;
+  late PlayerState _playerState = PlayerState.unknown;
+  late YoutubeMetaData _videoMetaData = YoutubeMetaData();
 
-  bool _isPlayerReady = false;
+  // late AnimationController _animController;
+
   bool _isFullScreen = false;
-  String? videoId = "";
+  bool _isPlayerReady = false;
 
   void listener() {
+    _isPlayerReady = true;
     if (_isPlayerReady && mounted && !_controller.value.isFullScreen) {
       setState(() {
         _playerState = _controller.value.playerState;
         _videoMetaData = _controller.metadata;
       });
     }
+
+    print("\n\n\nPLAYER STATUS : ${_controller.value.playerState} \n\n\n");
   }
 
   void onEnterFullScreen() {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    setState(() {
+      _isFullScreen = true;
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+
+      if (_controller.value.isFullScreen) {
+        setState(() {
+          _controller.flags.copyWith(
+            startAt: _controller.value.position.inSeconds,
+            autoPlay: true,
+          );
+        });
+      } else if (!_controller.value.isFullScreen) {
+        setState(() {
+          _controller.flags.copyWith(
+            startAt: _controller.value.position.inSeconds,
+            autoPlay: true,
+          );
+        });
+      }
+    });
   }
 
   void onExitFullScreen() {
-    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    setState(() {
+      _isFullScreen = false;
+      SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+
+      if (_controller.value.isFullScreen) {
+        setState(() {
+          _controller.flags.copyWith(
+            startAt: _controller.value.position.inSeconds,
+            autoPlay: true,
+          );
+        });
+      } else if (!_controller.value.isFullScreen) {
+        setState(() {
+          _controller.flags.copyWith(
+            startAt: _controller.value.position.inSeconds,
+            autoPlay: true,
+          );
+        });
+      }
+    });
+  }
+
+  void initVideo() {
+    String? videoId = widget.videoId;
+
+    _controller = YoutubePlayerController(
+      initialVideoId: videoId,
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        enableCaption: false,
+        loop: false,
+        startAt: 0,
+      ),
+    )..addListener(listener);
   }
 
   @override
   void initState() {
+    initVideo();
     super.initState();
 
-    videoId = widget.videoId;
-
-    _controller = YoutubePlayerController(
-      initialVideoId: videoId!,
-      flags: const YoutubePlayerFlags(
-        autoPlay: true,
-        controlsVisibleAtStart: false,
-        enableCaption: true,
-        loop: true,
-      ),
-    )..addListener(listener);
-
-    _animController = AnimationController(
-      vsync: this,
-      value: 0,
-      duration: const Duration(milliseconds: 300),
-    );
-    _playerState = PlayerState.unknown;
-    _videoMetaData = const YoutubeMetaData();
+    // _animController = AnimationController(
+    //   vsync: this,
+    //   value: 0,
+    //   duration: const Duration(milliseconds: 300),
+    // );
   }
 
   @override
@@ -80,11 +123,14 @@ class _VideoPlayerState extends State<VideoPlayer>
   @override
   void dispose() {
     _controller.dispose();
-    _animController.dispose();
-    // _idController.dispose();
-    // _seekToController.dispose();
+    // _animController.dispose();
     super.dispose();
   }
+
+  // Future<bool> _onWillPop() async {
+  //   _controller.play();
+  //   return _isFullScreen;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +141,45 @@ class _VideoPlayerState extends State<VideoPlayer>
       playedColor: Theme.of(context).primaryColor,
     );
 
-    return YoutubePlayerBuilder(
+    return _isFullScreen
+        ? player(_progressBarColors)
+        : _buildView(context, player(_progressBarColors));
+
+    // return WillPopScope(
+    //   child: OrientationBuilder(builder: (context, orientation) {
+    //     switch (orientation) {
+    //       case Orientation.landscape:
+    //         return Scaffold(
+    //           body: player(_progressBarColors),
+    //         );
+    //       case Orientation.portrait:
+    //         return _buildView(
+    //           context,
+    //           player(_progressBarColors),
+    //           _isFullScreen,
+    //         );
+    //       default:
+    //         return Container();
+    //     }
+    //   }),
+    //   onWillPop: _onWillPop,
+    // );
+  }
+
+  Widget _buildView(
+    BuildContext context,
+    Widget player,
+  ) {
+    return BuildBodyWidget(
+      appBar: KlinikAppBar(
+        title: "Playing Video",
+      ),
+      body: player,
+    );
+  }
+
+  Widget player(ProgressBarColors _progressBarColors) {
+    YoutubePlayerBuilder player = YoutubePlayerBuilder(
       onEnterFullScreen: onEnterFullScreen,
       onExitFullScreen: onExitFullScreen,
       player: YoutubePlayer(
@@ -103,6 +187,7 @@ class _VideoPlayerState extends State<VideoPlayer>
         showVideoProgressIndicator: true,
         progressIndicatorColor: Colors.blueAccent,
         progressColors: _progressBarColors,
+        topActions: [],
         bottomActions: [
           CurrentPosition(),
           ProgressBar(
@@ -110,66 +195,77 @@ class _VideoPlayerState extends State<VideoPlayer>
             colors: _progressBarColors,
           ),
           RemainingDuration(),
-          FullScreenButton(),
+          FullScreenButton(
+            controller: _controller,
+          ),
         ],
         onReady: () {
           setState(() {
-            _isPlayerReady = true;
+            if (_playerState == PlayerState.cued) {
+              _isPlayerReady = true;
+              _controller.play();
+            } else if (_playerState == PlayerState.paused) {
+              _controller.play();
+            }
+
             SystemChrome.setEnabledSystemUIMode(
               SystemUiMode.immersiveSticky,
               overlays: [SystemUiOverlay.bottom],
             );
           });
         },
-        onEnded: (data) {
-          _controller.pause();
-          _controller.reload();
-        },
+        onEnded: (data) {},
       ),
-      builder: (context, child) => BuildBodyWidget(
-        appBar: KlinikAppBar(title: "Playing Video"),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              child,
-              _sizedBox,
-              _isPlayerReady
-                  ? Container(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _text(
-                            _videoMetaData.title,
-                            fontSize: 24.0,
+      builder: (context, child) => _isFullScreen
+          ? SizedBox(child: child)
+          : SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: Column(
+                children: [
+                  child,
+                  _isPlayerReady
+                      ? Container(
+                          padding: const EdgeInsets.all(24.0),
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              _text(
+                                widget.videoData.title,
+                                fontSize: 32.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              _sizedBox,
+                              _text("Author : " + widget.videoData.author),
+                              _sizedBox,
+                            ],
                           ),
-                          _sizedBox,
-                          _text("Author : " + _videoMetaData.author),
-                          _sizedBox,
-                        ],
-                      ),
-                    )
-                  : const CircularProgressIndicator(
-                      color: Colors.white38,
-                      backgroundColor: Colors.white30,
-                    ),
-            ],
-          ),
-        ),
-      ),
+                        )
+                      : const CircularProgressIndicator(
+                          color: Colors.white38,
+                          backgroundColor: Colors.white30,
+                        ),
+                ],
+              ),
+            ),
     );
+
+    return player;
   }
 
   Widget _text(
     String? text, {
     double? fontSize,
+    FontWeight? fontWeight,
   }) =>
       Text(
         "$text",
         textAlign: TextAlign.left,
         style: TextStyle(
           fontSize: fontSize ?? 18.0,
-          color: Colors.white,
+          color: Theme.of(context).textTheme.bodyText1!.color,
+          fontWeight: fontWeight ?? FontWeight.normal,
         ),
       );
 
@@ -177,100 +273,3 @@ class _VideoPlayerState extends State<VideoPlayer>
         height: 20.0,
       );
 }
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_youtube_view/flutter_youtube_view.dart';
-// import 'package:klinik/core/core.dart';
-// import 'package:klinik/ui/widget/build_body_widget.dart';
-// import 'package:klinik/ui/widget/klinik_appbar.dart';
-
-// class VideoPlayer extends StatefulWidget {
-//   final String videoId;
-//   const VideoPlayer({Key? key, required this.videoId}) : super(key: key);
-
-//   @override
-//   State<VideoPlayer> createState() => _VideoPlayerState();
-// }
-
-// class _VideoPlayerState extends State<VideoPlayer>
-//     implements YouTubePlayerListener {
-//   late FlutterYoutubeViewController _viewController;
-//   double _currentVideoSecond = 0.0;
-//   String _playerState = "";
-
-//   void _onYoutubeCreated(FlutterYoutubeViewController controller) =>
-//       _viewController = controller;
-
-//   void _loadOrCueVideo() {
-//     _viewController.loadOrCueVideo('gcj2RUWQZ60', _currentVideoSecond);
-//   }
-
-//   @override
-//   void onCurrentSecond(double second) {
-//     print("onCurrentSecond second = $second");
-//     _currentVideoSecond = second;
-//   }
-
-//   @override
-//   void onError(String error) {
-//     print("ERROR when playing.\n$error");
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(
-//         content: Text("Error when playing video.\n msg : $error"),
-//         backgroundColor: Colors.red.shade200,
-//         duration: const Duration(milliseconds: 800),
-//         elevation: 2.0,
-//         padding: const EdgeInsets.all(16.0),
-//         width: Core.getDefaultAppWidth(context),
-//       ),
-//     );
-//   }
-
-//   @override
-//   void onReady() {
-//     _viewController.play();
-//   }
-
-//   @override
-//   void onStateChange(String state) {
-//     print("onStateChange state = $state");
-//     setState(() {
-//       _playerState = state;
-//     });
-//   }
-
-//   @override
-//   void onVideoDuration(double duration) {
-//     print("onVideoDuration duration = $duration");
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return BuildBodyWidget(
-//       appBar: KlinikAppBar(title: "Video Player"),
-//       body: SingleChildScrollView(
-//         child: Column(
-//           children: [
-//             SizedBox(
-//               height: Core.getDefaultAppHeight(context) / 2,
-//               width: Core.getDefaultAppWidth(context),
-//               child: FlutterYoutubeView(
-//                 listener: this,
-//                 onViewCreated: _onYoutubeCreated,
-//                 scaleMode: YoutubeScaleMode.fitWidth,
-//                 params: YoutubeParam(
-//                   videoId: widget.videoId,
-//                   autoPlay: true,
-//                   showFullScreen: false,
-//                   showUI: true,
-//                   showYoutube: false,
-//                   startSeconds: 0.0,
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

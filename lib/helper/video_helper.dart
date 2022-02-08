@@ -1,28 +1,15 @@
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'dart:convert';
+
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+// import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:http/http.dart' as http;
 
 ///Digunakan untuk melihat video thumbnail dari video yang ada di YouTube.
 class VideoHelper {
   static String getVideoId(String videoUrl) {
-    String? convertUrlToId(String url, {bool trimWhitespaces = true}) {
-      if (!url.contains("http") && (url.length == 11)) return url;
-      if (trimWhitespaces) url = url.trim();
+    String? id = YoutubePlayer.convertUrlToId(videoUrl);
 
-      for (var exp in [
-        RegExp(
-            r"^https:\/\/(?:www\.|m\.)?youtube\.com\/watch\?v=([_\-a-zA-Z0-9]{11}).*$"),
-        RegExp(
-            r"^https:\/\/(?:www\.|m\.)?youtube(?:-nocookie)?\.com\/embed\/([_\-a-zA-Z0-9]{11}).*$"),
-        RegExp(r"^https:\/\/youtu\.be\/([_\-a-zA-Z0-9]{11}).*$")
-      ]) {
-        Match? match = exp.firstMatch(url);
-        if (match != null && match.groupCount >= 1) return match.group(1);
-      }
-
-      return null;
-    }
-
-    String? videoId = convertUrlToId(videoUrl);
-    // print(videoId);
+    String? videoId = id;
 
     return "$videoId";
   }
@@ -30,7 +17,7 @@ class VideoHelper {
   static String getVideoThumbnail(String videoUrl) {
     String getThumbnail({
       required String videoId,
-      String quality = ThumbnailQuality.standard,
+      String quality = ThumbnailQuality.medium,
       bool webp = true,
     }) =>
         webp
@@ -42,5 +29,34 @@ class VideoHelper {
     print("THUMBNAIL : $thumbnailUrl");
 
     return thumbnailUrl;
+  }
+
+  static getVideoDetail(String videoUrl) async {
+    Future<dynamic> getDetail(String videoUrl) async {
+      String embedUrl =
+          "https://www.youtube.com/oembed?url=$videoUrl&format=json";
+
+      //store http request response to res variable
+      var res = await http.get(Uri.parse(embedUrl));
+      print("get youtube detail status code: ${res.statusCode.toString()}\n");
+
+      try {
+        if (res.statusCode == 200) {
+          //return the json from the response
+          return json.decode(res.body);
+        } else {
+          //return null if status code other than 200
+          return null;
+        }
+      } on FormatException catch (e) {
+        print('invalid JSON' + e.toString());
+        //return null if error
+        return null;
+      }
+    }
+
+    var jsonData = await getDetail(videoUrl);
+
+    return jsonData;
   }
 }

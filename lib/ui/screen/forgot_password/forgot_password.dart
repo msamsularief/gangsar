@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
+import 'package:klinik/helper/color_helper.dart';
 import 'package:klinik/ui/widget/build_body_widget.dart';
 import 'package:klinik/ui/widget/custom_button.dart';
 import 'package:klinik/ui/widget/custom_form_field.dart';
@@ -33,7 +33,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         padding: const EdgeInsets.all(24.0),
         physics: const ClampingScrollPhysics(),
         child: SizedBox(
-          height: Core.getDefaultBodyHeight(context),
+          height: Core.getDefaultBodyHeight(context) -
+              (Core.getDefaultAppBarHeight(context) * 1.2),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -81,8 +82,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     CustomButton.defaultButton(
                       title: "Kirim",
                       titleSize: 18.0,
-                      titleColor: Colors.orangeAccent.shade700,
-                      buttonDefaultColor: Colors.white,
+                      titleColor: Colors.white,
                       titleFontWeight: FontWeight.bold,
                       width: Core.getDefaultAppWidth(context),
                       height: 48.0,
@@ -109,7 +109,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         "$text",
         textAlign: textAlign ?? TextAlign.left,
         style: TextStyle(
-          color: color ?? Colors.white,
+          color: color ?? ColorHelper.fromHex("#240B1D"),
           fontSize: fontSize ?? 18.0,
           fontWeight: fontWeight ?? FontWeight.normal,
         ),

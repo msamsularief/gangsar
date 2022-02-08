@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:klinik/api/auth.dart';
+import 'package:klinik/core/app_route.dart';
 import 'package:klinik/helper/color_helper.dart';
+import 'package:klinik/model/app_info.dart';
 import 'package:klinik/ui/screen/login/login_page.dart';
+import 'package:klinik/ui/screen/splash/splash.dart';
 import 'package:klinik/utils/locator.dart';
 import 'package:klinik/utils/nav_service.dart';
 import 'package:klinik/utils/router_generator.dart';
+import 'package:package_info/package_info.dart';
+
+import 'bloc/klinik/klinik.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   KlinikSystemChrome.preferredOrientations;
   KlinikSystemChrome.uiOverlayStyle;
   await initializeDateFormatting('id_ID', null).then((_) => true);
+  firebaseApp = await Auth.initFirebaseApp();
+
+  appInfo = await PackageInfo.fromPlatform().then(
+    (value) => AppInfo(
+      version: value.version,
+    ),
+  );
 
   await Future.delayed(const Duration(milliseconds: 0), () {
     DefaultCacheManager().emptyCache();
@@ -20,7 +35,10 @@ Future<void> main() async {
 
   setupLocator();
 
-  runApp(const KlinikApp());
+  runApp(BlocProvider<KlinikBloc>(
+    create: (context) => KlinikBloc()..add(StartupEvent()),
+    child: KlinikApp(),
+  ));
 }
 
 ///Root of Klinik App
@@ -29,12 +47,27 @@ class KlinikApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final klinikBloc = BlocProvider.of<KlinikBloc>(context);
     return MaterialApp(
-      title: 'Klinik Kesehatan Digital',
+      title: 'Gangsar O',
       theme: KlinikTheme.theme,
-      home: const LoginPage(),
+      home: BlocListener<KlinikBloc, KlinikState>(
+        listener: (context, state) {
+          print('main state : $state');
+          if (state is AuthenticationAuthenticated) {
+            navigateAndReplace(AppRoute.home);
+          }
+          if (state is AuthenticationUnauthenticated) {
+            navigateAndReplace(AppRoute.login);
+          }
+        },
+        child: Splash(),
+      ),
       navigatorKey: locator<NavigationService>().navigationKey,
-      onGenerateRoute: (settings) => RouterGenerator.generateRoute(settings),
+      onGenerateRoute: (settings) => RouterGenerator.generateRoute(
+        settings,
+        klinikBloc,
+      ),
     );
   }
 }
@@ -62,18 +95,19 @@ class KlinikTheme {
       fontSize: 16,
       letterSpacing: 0.4,
       wordSpacing: 0.0,
+      color: ColorHelper.fromHex("#240B1D"),
     );
 
     return ThemeData.light().copyWith(
       platform: TargetPlatform.android,
-      primaryColor: ColorHelper.fromHex("#FFE65100"),
-      primaryColorLight: Colors.orange,
+      primaryColor: ColorHelper.fromHex("#D6009A"),
+      primaryColorLight: ColorHelper.fromHex("#FF9CEE"),
       textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
           textStyle: MaterialStateProperty.all<TextStyle>(
             TextStyle(
-              color: Colors.orangeAccent.shade400,
+              color: ColorHelper.fromHex("#D6009A"),
               backgroundColor: Colors.transparent,
               fontSize: 18.0,
               letterSpacing: 0.4,
@@ -89,8 +123,8 @@ class KlinikTheme {
         bodyText2: originalBody1,
       ),
       colorScheme: ColorScheme.fromSwatch(
-        backgroundColor: Colors.orange,
-      ).copyWith(secondary: Colors.orange),
+        backgroundColor: Colors.white,
+      ).copyWith(secondary: ColorHelper.fromHex("#D6009A")),
     );
   }
 }

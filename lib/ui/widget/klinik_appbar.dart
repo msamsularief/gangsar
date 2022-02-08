@@ -4,32 +4,48 @@ import 'package:klinik/core/core.dart';
 ///Default AppBar untuk aplikasi Klinik Digital
 class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double? height;
-  final List<Widget>? children;
+  final List<Widget>? actions;
   final Widget? leading;
-  final String title;
+
+  ///Jika [child] tidak kosong, maka [title] tidak akan ditampilkan.
+  final String? title;
   final PreferredSizeWidget? bottom;
   final bool? centerTitle;
   final bool automaticallyImplyLeading;
   final bool shadow;
   final double titleSpacing;
   final Color? leadingButtonColor;
+  final Widget? flexibleSpace;
 
-  @override
-  final Size preferredSize = Size.fromHeight(AppBar().preferredSize.height);
+  ///Digunakan untuk mengganti [title].
+  ///Jika [child] tidak kosong, maka [title] otomatis akan di-*replace*.
+  ///
+  final Widget? child;
 
   KlinikAppBar({
     Key? key,
     this.height,
-    this.children,
+    this.actions,
     this.leading,
-    required this.title,
+    this.title,
     this.bottom,
     this.centerTitle,
     this.automaticallyImplyLeading = true,
     this.shadow = true,
     this.titleSpacing = NavigationToolbar.kMiddleSpacing,
     this.leadingButtonColor,
+    this.flexibleSpace,
+    this.child,
   }) : super(key: key);
+
+  @override
+  Size get preferredSize {
+    if (height == null) {
+      return Size.fromHeight(AppBar().preferredSize.height);
+    } else {
+      return Size.fromHeight(height!);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +67,7 @@ class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
         color: Theme.of(context).primaryColor,
       ),
       child: AppBar(
-        actions: children,
+        actions: actions,
         bottom: bottom,
         leading: leading == null && automaticallyImplyLeading == true
             ? TextButton(
@@ -75,13 +91,15 @@ class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
         primary: false,
         centerTitle: centerTitle,
         automaticallyImplyLeading: automaticallyImplyLeading,
-        title: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 40.0,
-          ),
-        ),
+        title: child ??
+            Text(
+              title!,
+              style: const TextStyle(
+                fontSize: 40.0,
+              ),
+            ),
         titleSpacing: titleSpacing,
+        flexibleSpace: flexibleSpace,
       ),
     );
   }

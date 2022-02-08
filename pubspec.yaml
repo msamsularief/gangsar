@@ -2,7 +2,7 @@ name: klinik
 description: A new Flutter project.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+1
+version: 1.2.0+2
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -10,12 +10,15 @@ dependencies:
   flutter:
     sdk: flutter
 
+  meta: ^1.7.0
+  firebase_auth: ^3.3.6
+  firebase_core: ^1.12.0
   cupertino_icons: ^1.0.2
   get_it: ^7.2.0
   date_time_picker: ^2.1.0
   intl: ^0.17.0
-  bloc: ^8.0.1
-  flutter_bloc: ^8.0.0
+  bloc: ^8.0.2
+  flutter_bloc: ^8.0.1
   equatable: ^2.0.3
   carousel_slider: ^4.0.0
   path_provider: ^2.0.8
@@ -23,7 +26,14 @@ dependencies:
   youtube_player_iframe: ^2.2.2
   cached_network_image: ^3.2.0
   flutter_cache_manager: ^3.3.0
-  flutter_youtube_view: ^2.0.2
+  package_info: ^2.0.2
+  flutter_launcher_icons: ^0.9.2
+  # video_player: ^2.2.10
+  # better_player: ^0.0.81
+  # fl_chart: ^0.41.0
+  syncfusion_flutter_charts: ^19.4.48+1
+  shared_preferences: ^2.0.13
+  firebase_auth_web: ^3.3.7
 
 dev_dependencies:
   flutter_test:
@@ -34,6 +44,11 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/img/
   #   - images/a_dot_ham.jpeg
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/img/logo.png"

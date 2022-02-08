@@ -73,6 +73,7 @@ class TabSelector extends StatelessWidget {
       alignment: Alignment.center,
       tooltip: label,
       visualDensity: VisualDensity.comfortable,
+      padding: EdgeInsets.zero,
       icon: Container(
         decoration: BoxDecoration(
           color: Colors.white,

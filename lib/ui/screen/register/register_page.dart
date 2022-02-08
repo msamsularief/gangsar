@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:klinik/bloc/register/register.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
+import 'package:klinik/helper/color_helper.dart';
 import 'package:klinik/helper/date_formatter.dart';
 import 'package:klinik/ui/widget/build_body_widget.dart';
 import 'package:klinik/ui/widget/custom_button.dart';
 import 'package:klinik/ui/widget/custom_form_field.dart';
+import 'package:klinik/ui/widget/klinik_flashbar.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -17,6 +20,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   TextEditingController emailController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   TextEditingController birthdayController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController addressController = TextEditingController();
@@ -29,6 +33,9 @@ class _RegisterPageState extends State<RegisterPage> {
   DateTime? currentDate;
 
   bool isChecked = false;
+  bool isObscure = true;
+
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -44,113 +51,180 @@ class _RegisterPageState extends State<RegisterPage> {
     emailController.dispose();
     fullNameController.dispose();
     birthdayController.dispose();
+    passwordController.dispose();
     phoneController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final registerBloc = BlocProvider.of<RegisterBloc>(context);
     return BuildBodyWidget(
-      body: _buildBody(context),
+      body: BlocListener<RegisterBloc, RegisterState>(
+        listener: (context, state) {
+          if (state is RegisterLoading) {
+            isLoading = !isLoading;
+          }
+          if (state is RegisterSuccess) {
+            navigateAndReplace(AppRoute.login);
+          }
+          if (state is RegisterFailure) {
+            isLoading = false;
+
+            FlashBar.showError(context, message: state.error);
+          }
+        },
+        child: _buildBody(context, registerBloc),
+      ),
     );
   }
 
-  Widget _buildBody(BuildContext context) => SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        physics: const ClampingScrollPhysics(),
-        child: SizedBox(
-          // height: Core.getDefaultBodyHeight(context),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _sizedBox(),
-                _text(
-                  "Daftar",
-                  fontSize: 56.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                _sizedBox(),
-                _buildFormField(
-                  controller: fullNameController,
-                  hintText: "masukkan nama lengkap anda",
-                  labelText: "Nama Lengkap",
-                ),
-                _buildFormField(
-                  controller: emailController,
-                  hintText: "masukkan alamat email anda",
-                  labelText: "Email",
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                _buildFormField(
-                  controller: birthdayController,
-                  hintText: "masukkan alamat email anda",
-                  labelText: "Tanggal Lahir",
-                  keyboardType: TextInputType.datetime,
-                  readOnly: true,
-                  onTap: () async {
-                    DateTime? result = await showDatePicker(
-                      context: context,
-                      initialDate: initialDate!,
-                      firstDate: initialFirstDate!,
-                      lastDate: currentDate!,
-                      currentDate: currentDate!,
-                      cancelText: "Cancel",
-                      confirmText: "Ok",
-                      helpText: "Select Your Birth Day Date",
-                      fieldHintText: "Bulan/Tanggal/Tahun",
-                      initialDatePickerMode: DatePickerMode.day,
-                      initialEntryMode: DatePickerEntryMode.calendarOnly,
-                      builder: (context, child) => child!,
-                    );
+  Widget _buildBody(
+    BuildContext context,
+    RegisterBloc registerBloc,
+  ) {
+    void onRegisterButtonPressed() {
+      if (_formKey.currentState!.validate()) {
+        registerBloc.add(
+          RegisterButtonPressed(
+            email: emailController.text,
+            password: passwordController.text,
+            fullName: fullNameController.text,
+            phoneNum: phoneController.text,
+          ),
+        );
+      }
+    }
 
-                    if (result != null) {
-                      setState(() {
-                        birthdayController.text = result.toString().todMMMMy();
-                        initialDate = result;
-                      });
-                    }
-                  },
-                ),
-                _buildFormField(
-                  controller: phoneController,
-                  hintText: "masukkan nomor telepon anda",
-                  labelText: "Nomor Telepon",
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                ),
-                _buildFormField(
-                  controller: addressController,
-                  hintText: "masukkan alamat email anda",
-                  labelText: "Alamat Lengkap",
-                  keyboardType: TextInputType.multiline,
-                  textInputAction: TextInputAction.newline,
-                  maxLines: 2,
-                ),
-                _sizedBox(),
-                _buildCheckBox(),
-                _sizedBox(
-                  height: 48.0,
-                ),
-                CustomButton.defaultButton(
-                  title: "Daftar",
-                  titleSize: 18.0,
-                  titleColor: Colors.orangeAccent.shade700,
-                  buttonDefaultColor: Colors.white,
-                  titleFontWeight: FontWeight.bold,
-                  width: Core.getDefaultAppWidth(context),
-                  height: 48.0,
-                  onPressed: () => navigateAndRemoveUntil(
-                    AppRoute.login,
+    return BlocBuilder<RegisterBloc, RegisterState>(
+      builder: (context, state) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          physics: ClampingScrollPhysics(),
+          child: SizedBox(
+            // height: Core.getDefaultBodyHeight(context),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _sizedBox(),
+                  _text(
+                    "Daftar",
+                    fontSize: 56.0,
+                    fontWeight: FontWeight.bold,
                   ),
-                ),
-              ],
+                  _sizedBox(),
+                  _buildFormField(
+                    controller: fullNameController,
+                    hintText: "masukkan nama lengkap anda",
+                    labelText: "Nama Lengkap",
+                  ),
+                  _buildFormField(
+                    controller: emailController,
+                    hintText: "masukkan alamat email anda",
+                    labelText: "Email",
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  _buildFormField(
+                    controller: passwordController,
+                    hintText: "masukkan password anda",
+                    labelText: "Password",
+                    keyboardType: TextInputType.visiblePassword,
+                    obsecureText: isObscure,
+                    suffixIcon: GestureDetector(
+                      onTap: () => setState(() => isObscure = !isObscure),
+                      child: Icon(
+                        isObscure
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off,
+                        color: Colors.grey.shade400,
+                        size: 24.0,
+                      ),
+                    ),
+                    validator: (value) => value!.length < 8
+                        ? 'Password tidak boleh kurang dari 8'
+                        : null,
+                  ),
+                  _buildFormField(
+                    controller: birthdayController,
+                    hintText: "masukkan tanggal lahir anda",
+                    labelText: "Tanggal Lahir",
+                    keyboardType: TextInputType.datetime,
+                    readOnly: true,
+                    onTap: () async {
+                      DateTime? result = await showDatePicker(
+                        context: context,
+                        initialDate: initialDate!,
+                        firstDate: initialFirstDate!,
+                        lastDate: currentDate!,
+                        currentDate: currentDate!,
+                        cancelText: "Cancel",
+                        confirmText: "Ok",
+                        helpText: "Select Your Birth Day Date",
+                        fieldHintText: "Bulan/Tanggal/Tahun",
+                        initialDatePickerMode: DatePickerMode.day,
+                        initialEntryMode: DatePickerEntryMode.calendarOnly,
+                        builder: (context, child) => child!,
+                      );
+
+                      if (result != null) {
+                        setState(() {
+                          birthdayController.text =
+                              result.toString().todMMMMy();
+                          initialDate = result;
+                        });
+                      }
+                    },
+                  ),
+                  _buildFormField(
+                    controller: phoneController,
+                    hintText: "masukkan nomor telepon anda",
+                    labelText: "Nomor Telepon",
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  _buildFormField(
+                    controller: addressController,
+                    hintText: "masukkan alamat lengkap anda",
+                    labelText: "Alamat Lengkap",
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    maxLines: 2,
+                  ),
+                  _sizedBox(),
+                  _buildCheckBox(),
+                  _sizedBox(
+                    height: 48.0,
+                  ),
+                  isLoading
+                      ? CustomButton.loadingButton(
+                          buttonColor:
+                              Theme.of(context).primaryColor.withOpacity(
+                                    0.18,
+                                  ),
+                          height: 48.0,
+                          loadingColor: Theme.of(context).primaryColor,
+                          width: Core.getDefaultAppWidth(context),
+                        )
+                      : CustomButton.defaultButton(
+                          title: "Daftar",
+                          titleSize: 18.0,
+                          titleColor: Colors.white,
+                          titleFontWeight: FontWeight.bold,
+                          width: Core.getDefaultAppWidth(context),
+                          height: 48.0,
+                          onPressed: onRegisterButtonPressed,
+                        ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
+      },
+    );
+  }
 
   Widget _buildFormField({
     required TextEditingController controller,
@@ -161,6 +235,9 @@ class _RegisterPageState extends State<RegisterPage> {
     int? maxLines,
     bool? readOnly,
     VoidCallback? onTap,
+    String? Function(String?)? validator,
+    bool obsecureText = false,
+    Widget? suffixIcon,
   }) {
     return Column(
       children: [
@@ -183,6 +260,9 @@ class _RegisterPageState extends State<RegisterPage> {
           maxLines: maxLines,
           readOnly: readOnly ?? false,
           onTap: onTap,
+          obscureText: obsecureText,
+          suffixIcon: suffixIcon,
+          validator: validator,
         ),
       ],
     );
@@ -194,23 +274,27 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    isChecked = !isChecked;
-                  });
-                },
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  child: Icon(
-                    isChecked
-                        ? Icons.check_box_rounded
-                        : Icons.check_box_outline_blank_rounded,
-                    color: isChecked ? Colors.white : Colors.white,
-                  ),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  isChecked = !isChecked;
+                });
+              },
+              child: Container(
+                alignment: Alignment.centerLeft,
+                child: Icon(
+                  isChecked
+                      ? Icons.check_box_rounded
+                      : Icons.check_box_outline_blank_rounded,
+                  color: isChecked
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context).primaryColor.withOpacity(0.4),
+                  size: 26.0,
                 ),
               ),
+            ),
+            SizedBox(
+              width: 8.0,
             ),
             Expanded(
               flex: 10,
@@ -220,7 +304,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 fontSize: 16.0,
                 textAlign: TextAlign.justify,
                 fontWeight: FontWeight.w300,
-                color: Colors.white,
+                color: ColorHelper.fromHex("#240B1D"),
               ),
             ),
           ],
@@ -238,7 +322,7 @@ class _RegisterPageState extends State<RegisterPage> {
         "$text",
         textAlign: textAlign ?? TextAlign.left,
         style: TextStyle(
-          color: color ?? Colors.white,
+          color: color ?? ColorHelper.fromHex("#240B1D"),
           fontSize: fontSize ?? 18.0,
           fontWeight: fontWeight ?? FontWeight.normal,
         ),
