@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/core/image_initial.dart';
-import 'package:klinik/model/image_component.dart';
+import 'package:klinik/models/image_component.dart';
 import 'package:klinik/ui/widget/home_widget/home_klinik_appbar.dart';
 import 'package:klinik/ui/widget/image_builder.dart';
 

@@ -1,4 +1,4 @@
-import 'package:klinik/model/image_component.dart';
+import 'package:klinik/models/image_component.dart';
 
 class Article {
   final String? title;

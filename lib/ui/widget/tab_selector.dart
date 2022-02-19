@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:klinik/model/app_tab.dart';
+import 'package:klinik/models/app_tab.dart';
 
 class TabSelector extends StatelessWidget {
   final AppTab? activeTab;

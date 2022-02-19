@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:klinik/bloc/login/login.dart';
 import 'package:klinik/core/app_route.dart';
@@ -45,7 +46,11 @@ class _LoginPageState extends State<LoginPage> {
           listener: (context, state) {
             if (state is LoginFailure) {
               isLoading = false;
-              FlashBar.showError(context, message: state.error);
+              FlashBar.showError(
+                context,
+                message: state.error,
+                duration: Duration(milliseconds: 2600),
+              );
             }
             if (state is LoginLoading) {
               isLoading = !isLoading;
@@ -63,8 +68,11 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildBody(BuildContext context, LoginBloc loginBloc) {
     void onLoginButtonPressed() {
-      passwordFocus.unfocus();
+      TextInput.finishAutofillContext(
+        shouldSave: true,
+      );
       if (_formKey.currentState!.validate()) {
+        passwordFocus.unfocus();
         loginBloc.add(
           LoginButtonPressed(
               email: emailController.text, password: passwdController.text),
@@ -108,108 +116,124 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Expanded(
                     flex: 4,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: _text(
-                            "Email :",
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        _sizedBox(
-                          height: 4.0,
-                        ),
-                        CustomFormField(
-                          validator: (p) =>
-                              p == null ? 'email cannot be null' : null,
-                          controller: emailController,
-                          hintText: "Enter your email",
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          onFieldSubmitted: (p0) => formFocusNode(
-                            context,
-                            passwordFocus,
-                          ),
-                        ),
-                        _sizedBox(),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: _text(
-                            "Password :",
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        _sizedBox(
-                          height: 4.0,
-                        ),
-                        CustomFormField(
-                          validator: (value) => value?.length == null
-                              ? 'password cannot be null'
-                              : value!.characters.length < 8 &&
-                                      value.characters.length > 1
-                                  ? 'password kurang dari 8'
-                                  : null,
-                          focusNode: passwordFocus,
-                          controller: passwdController,
-                          hintText: "Enter your password",
-                          obscureText: isObscureTextVisible,
-                          textInputAction: TextInputAction.go,
-                          onFieldSubmitted: (p0) => onLoginButtonPressed,
-                          suffixIcon: GestureDetector(
-                            onTap: () => setState(
-                              () =>
-                                  isObscureTextVisible = !isObscureTextVisible,
-                            ),
-                            child: Icon(
-                              isObscureTextVisible
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off,
-                              color: Colors.grey.shade400,
-                              size: 24.0,
-                            ),
-                          ),
-                        ),
-                        _sizedBox(
-                          height: 10.0,
-                        ),
-                        Container(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              navigateTo(AppRoute.forgotPassword);
-                            },
+                    child: AutofillGroup(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            alignment: Alignment.centerLeft,
                             child: _text(
-                              "Lupa Password?",
+                              "Email :",
                               textAlign: TextAlign.left,
                             ),
                           ),
-                        ),
-                        _sizedBox(
-                          height: 48.0,
-                        ),
-                        isLoading
-                            ? CustomButton.loadingButton(
-                                buttonColor:
-                                    Theme.of(context).primaryColor.withOpacity(
-                                          0.18,
-                                        ),
-                                height: 48.0,
-                                loadingColor: Theme.of(context).primaryColor,
-                                width: Core.getDefaultAppWidth(context),
-                              )
-                            : CustomButton.defaultButton(
-                                title: "Masuk",
-                                titleSize: 18.0,
-                                titleColor: Colors.white,
-                                titleFontWeight: FontWeight.bold,
-                                width: Core.getDefaultAppWidth(context),
-                                height: 48.0,
-                                onPressed: onLoginButtonPressed,
+                          _sizedBox(
+                            height: 4.0,
+                          ),
+                          CustomFormField(
+                            validator: (value) {
+                              if (value == null) {
+                                return 'email cannot be null';
+                              } else {
+                                return null;
+                              }
+                            },
+                            controller: emailController,
+                            hintText: "Enter your email",
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (p0) => formFocusNode(
+                              context,
+                              passwordFocus,
+                            ),
+                            autofillHints: [AutofillHints.email],
+                          ),
+                          _sizedBox(),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            child: _text(
+                              "Password :",
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          _sizedBox(
+                            height: 4.0,
+                          ),
+                          CustomFormField(
+                            validator: (value) {
+                              if (value == null) {
+                                return 'password cannot be null';
+                              } else if (value.length < 8) {
+                                return 'password must bigger than 8 character';
+                              }
+                            },
+                            onEditingComplete: () =>
+                                TextInput.finishAutofillContext(
+                              shouldSave: true,
+                            ),
+                            focusNode: passwordFocus,
+                            controller: passwdController,
+                            hintText: "Enter your password",
+                            obscureText: isObscureTextVisible,
+                            textInputAction: TextInputAction.go,
+                            keyboardType: TextInputType.visiblePassword,
+                            autofillHints: [AutofillHints.password],
+                            onFieldSubmitted: (p0) => onLoginButtonPressed(),
+                            suffixIcon: GestureDetector(
+                              onTap: () => setState(
+                                () => isObscureTextVisible =
+                                    !isObscureTextVisible,
                               ),
-                      ],
+                              child: Icon(
+                                isObscureTextVisible
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off,
+                                color: Colors.grey.shade400,
+                                size: 24.0,
+                              ),
+                            ),
+                          ),
+                          _sizedBox(
+                            height: 10.0,
+                          ),
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              onTap: () {
+                                navigateTo(AppRoute.forgotPassword);
+                              },
+                              child: _text(
+                                "Lupa Password?",
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ),
+                          _sizedBox(
+                            height: 48.0,
+                          ),
+                          isLoading
+                              ? CustomButton.loadingButton(
+                                  buttonColor: Theme.of(context)
+                                      .primaryColor
+                                      .withOpacity(
+                                        0.18,
+                                      ),
+                                  height: 48.0,
+                                  loadingColor: Theme.of(context).primaryColor,
+                                  width: Core.getDefaultAppWidth(context),
+                                )
+                              : CustomButton.defaultButton(
+                                  title: "Masuk",
+                                  titleSize: 18.0,
+                                  titleColor: Colors.white,
+                                  titleFontWeight: FontWeight.bold,
+                                  width: Core.getDefaultAppWidth(context),
+                                  height: 48.0,
+                                  onPressed: () => onLoginButtonPressed(),
+                                ),
+                        ],
+                      ),
                     ),
                   ),
                   Expanded(

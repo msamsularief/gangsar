@@ -1,9 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:klinik/models/chart.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class BmiChartWidget extends StatelessWidget {
-  const BmiChartWidget({Key? key}) : super(key: key);
+  final List<Chart> items;
+  const BmiChartWidget({Key? key, required this.items}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,16 +15,33 @@ class BmiChartWidget extends StatelessWidget {
 
   ///Get the chart with multi colored line series
   SfCartesianChart _buildMultiColorLineChart(BuildContext context) {
+    List<double> numbersIndexKg = [];
+    List<double> numbersWeeks = [];
+    items.map((e) {
+      numbersIndexKg.add(double.parse(e.massIndex));
+      numbersWeeks.add(double.parse(e.week));
+    }).toList();
+
+    final numberMax = numbersIndexKg.reduce((max));
+    final weekMax = numbersWeeks.reduce((max));
+    final weekMin = numbersWeeks.reduce((min));
+
     return SfCartesianChart(
-      title: ChartTitle(text: 'Annual rainfall of Paris'),
+      title: ChartTitle(
+        text: 'Grafik Peningkatan Berat Badan'.toUpperCase(),
+        textStyle: Theme.of(context).textTheme.bodyText1!.copyWith(
+              fontSize: 13.0,
+              fontWeight: FontWeight.w500,
+            ),
+      ),
       plotAreaBorderWidth: 0,
       primaryXAxis: NumericAxis(
         anchorRangeToVisiblePoints: true,
         majorGridLines: const MajorGridLines(width: 0),
-        minimum: 2,
-        maximum: 43,
-        visibleMaximum: 43,
-        interval: 20,
+        minimum: weekMin > 0 ? weekMin - 1 : 0,
+        maximum: weekMax,
+        visibleMaximum: weekMax + 3,
+        interval: 1,
         autoScrollingMode: AutoScrollingMode.start,
         axisLine: const AxisLine(width: 0),
         majorTickLines: const MajorTickLines(size: 0.0),
@@ -29,9 +49,9 @@ class BmiChartWidget extends StatelessWidget {
       ),
       primaryYAxis: NumericAxis(
         minimum: -2,
-        maximum: 27,
-        interval: 20,
-        visibleMaximum: 27,
+        maximum: numberMax,
+        interval: 1,
+        visibleMaximum: numberMax + 3,
         axisLine: const AxisLine(width: 0),
         labelFormat: '{value}kg',
         autoScrollingMode: AutoScrollingMode.start,
@@ -51,19 +71,19 @@ class BmiChartWidget extends StatelessWidget {
         enablePinching: true,
         selectionRectBorderWidth: 2,
       ),
-      enableMultiSelection: true,
       legend: Legend(
         isResponsive: true,
+        isVisible: false,
       ),
       crosshairBehavior: CrosshairBehavior(
         activationMode: ActivationMode.singleTap,
-        enable: true,
+        enable: false,
         hideDelay: 2600,
         lineColor: Theme.of(context).primaryColor,
       ),
       tooltipBehavior: TooltipBehavior(
         enable: true,
-        header: '',
+        header: 'aaa',
         canShowMarker: false,
       ),
     );
@@ -71,77 +91,69 @@ class BmiChartWidget extends StatelessWidget {
 
   ///Get multi colored line series
   List<LineSeries<ChartData, double>> _getMultiColoredLineSeries() {
+    List<ChartData> charts = [];
+    items.map((e) {
+      Color color;
+      ChartData data;
+      final toDouble = double.parse(e.massIndex);
+      Key key = ValueKey(e.userId);
+      if (toDouble < 18.5) {
+        color = Color.fromARGB(255, 255, 110, 81);
+        data = ChartData(
+          double.parse(e.week),
+          double.parse(e.massIndex),
+          color,
+          key,
+        );
+        charts.add(data);
+      } else if (toDouble >= 18.5 && toDouble <= 24.9) {
+        color = Color.fromARGB(255, 42, 229, 49);
+        data = ChartData(
+          double.parse(e.week),
+          double.parse(e.massIndex),
+          color,
+          key,
+        );
+        charts.add(data);
+      } else if (toDouble >= 25.0 && toDouble <= 29.9) {
+        color = Color.fromARGB(255, 255, 61, 12);
+        data = ChartData(
+          double.parse(e.week),
+          double.parse(e.massIndex),
+          color,
+          key,
+        );
+        charts.add(data);
+      } else {
+        color = Color.fromARGB(255, 215, 0, 0);
+        data = ChartData(
+          double.parse(e.week),
+          double.parse(e.massIndex),
+          color,
+          key,
+        );
+        charts.add(data);
+      }
+    }).toList();
+
     return <LineSeries<ChartData, double>>[
       LineSeries<ChartData, double>(
         animationDuration: 2500,
-        dataSource: <ChartData>[
-          ChartData(1, 19.0, Color(0xFFF8B883)),
-          ChartData(2, 20.0, Color(0xFFF8B883)),
-          ChartData(3, 20.5, Color(0xFFF8B883)),
-          ChartData(4, 18.6, Color(0xFFF8B883)),
-          ChartData(5, 20.3, Color(0xFFF8B883)),
-          ChartData(6, 14.0, Color(0xFFF8B883)),
-          ChartData(7, 21.0, Color(0xFFE56590)),
-          ChartData(8, 21.2, Color(0xFFE56590)),
-          ChartData(9, 23.4, Color(0xFFE56590)),
-          ChartData(10, 21.1, Color(0xFFE56590)),
-          ChartData(11, 19.3, Color(0xFFE56590)),
-          ChartData(13, 17.2, Color(0xFF357CD2)),
-          ChartData(14, 15.0, Color(0xFF357CD2)),
-          ChartData(15, 17.0, Color(0xFF357CD2)),
-          ChartData(16, 19.0, Color(0xFF357CD2)),
-          ChartData(17, 21.0, Color(0xFF357CD2)),
-          ChartData(18, 18.9, Color(0xFF00BDAE)),
-          ChartData(19, 19.7, Color(0xFF00BDAE)),
-          ChartData(20, 20.0, Color(0xFF00BDAE)),
-          ChartData(21, 21.0, Color(0xFF00BDAE)),
-          ChartData(22, 20.0, Color(0xFF00BDAE))
-        ],
-        xValueMapper: (ChartData sales, _) => sales.x,
-        yValueMapper: (ChartData sales, _) => sales.y,
+
+        dataSource: charts,
+        xValueMapper: (ChartData chart, _) => chart.x,
+        yValueMapper: (ChartData chart, _) => chart.y,
 
         /// The property used to apply the color each data.
-        pointColorMapper: (ChartData sales, _) => sales.lineColor,
-        width: 2,
+        pointColorMapper: (ChartData chart, _) => chart.lineColor,
+        width: 3.6,
       ),
-      LineSeries<ChartData, double>(
-        animationDuration: 2500,
-        dataSource: <ChartData>[
-          ChartData(1, 10.0, Color(0xFFF8B883)),
-          ChartData(2, 20.0, Color(0xFFF8B883)),
-          ChartData(3, 20.5, Color(0xFFF8B883)),
-          ChartData(4, 14.6, Color(0xFFF8B883)),
-          ChartData(5, 22.3, Color(0xFFF8B883)),
-          ChartData(6, 13.0, Color(0xFFF8B883)),
-          ChartData(7, 12.0, Color(0xFFE56590)),
-          ChartData(8, 21.2, Color(0xFFE56590)),
-          ChartData(9, 20.4, Color(0xFFE56590)),
-          ChartData(10, 17.1, Color(0xFFE56590)),
-          ChartData(11, 16.3, Color(0xFFE56590)),
-          ChartData(13, 18.2, Color(0xFF357CD2)),
-          ChartData(14, 16.7, Color(0xFF357CD2)),
-          ChartData(15, 16.4, Color(0xFF357CD2)),
-          ChartData(16, 22.0, Color(0xFF357CD2)),
-          ChartData(17, 18.4, Color(0xFF357CD2)),
-          ChartData(18, 19.9, Color(0xFF00BDAE)),
-          ChartData(19, 22.7, Color(0xFF00BDAE)),
-          ChartData(20, 17.0, Color(0xFF00BDAE)),
-          ChartData(21, 23.0, Color(0xFF00BDAE)),
-          ChartData(22, 22.0, Color(0xFF00BDAE))
-        ],
-        xValueMapper: (ChartData sales, _) => sales.x,
-        yValueMapper: (ChartData sales, _) => sales.y,
-
-        /// The property used to apply the color each data.
-        pointColorMapper: (ChartData sales, _) => sales.lineColor,
-        width: 2,
-      )
     ];
   }
 }
 
 class ChartData {
-  ChartData(this.x, this.y, [this.lineColor]);
+  ChartData(this.x, this.y, [this.lineColor, Key? key]);
   final double x;
   final double y;
   final Color? lineColor;

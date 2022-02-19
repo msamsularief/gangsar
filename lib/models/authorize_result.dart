@@ -1,4 +1,4 @@
-import 'package:klinik/model/account.dart';
+import 'package:klinik/models/account.dart';
 
 class AuthorizeResult {
   late final Account? account;

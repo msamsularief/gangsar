@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/core/image_initial.dart';
 import 'package:klinik/helper/video_helper.dart';
-import 'package:klinik/model/image_component.dart';
+import 'package:klinik/models/image_component.dart';
 import 'package:klinik/ui/widget/image_builder.dart';
 
 class SliderWidget extends StatefulWidget {

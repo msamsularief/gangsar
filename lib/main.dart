@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,13 +7,13 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:klinik/api/auth.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/helper/color_helper.dart';
-import 'package:klinik/model/app_info.dart';
-import 'package:klinik/ui/screen/login/login_page.dart';
+import 'package:klinik/models/app_info.dart';
 import 'package:klinik/ui/screen/splash/splash.dart';
 import 'package:klinik/utils/locator.dart';
 import 'package:klinik/utils/nav_service.dart';
 import 'package:klinik/utils/router_generator.dart';
 import 'package:package_info/package_info.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'bloc/klinik/klinik.dart';
 
@@ -21,7 +22,8 @@ Future<void> main() async {
   KlinikSystemChrome.preferredOrientations;
   KlinikSystemChrome.uiOverlayStyle;
   await initializeDateFormatting('id_ID', null).then((_) => true);
-  firebaseApp = await Auth.initFirebaseApp();
+  dotenv.load(fileName: ".env"); //LOAD ENV FILE
+  firebaseApp = await Firebase.initializeApp();
 
   appInfo = await PackageInfo.fromPlatform().then(
     (value) => AppInfo(

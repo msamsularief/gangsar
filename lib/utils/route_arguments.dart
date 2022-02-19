@@ -1,5 +1,5 @@
 import 'package:klinik/core/image_initial.dart';
-import 'package:klinik/model/image_component.dart';
+import 'package:klinik/models/image_component.dart';
 
 /// RouteArguments digunakan untuk memberikan
 /// argument pada setiap route yang membutuhkan parameter

@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:klinik/core/core.dart';
-import 'package:klinik/model/image_component.dart';
+import 'package:klinik/models/image_component.dart';
 
 class Imagebuilder extends StatelessWidget {
   final ImageComponent imageComponent;

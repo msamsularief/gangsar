@@ -1,8 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:klinik/api/auth.dart';
 import 'package:klinik/bloc/register/register.dart';
-import 'package:klinik/core/app_route.dart';
-import 'package:klinik/model/authorize_result.dart';
+import 'package:klinik/models/authorize_result.dart';
 
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   RegisterBloc() : super(RegisterInitial()) {
@@ -18,18 +17,13 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
           event.phoneNum,
         );
 
-        // print('\nResult : ${result?.message}\n');
-
         if (result != null) {
           if (result.message == 'Register Success') {
-            // print("\n\n\n${result.message}\n\n\n");
             emit(RegisterSuccess(message: result.message));
           } else {
-            print(result.message);
             emit(RegisterFailure(error: result.message!));
           }
         } else {
-          print(result);
           emit(RegisterFailure(error: 'cannot get data from server !'));
         }
       } catch (e) {

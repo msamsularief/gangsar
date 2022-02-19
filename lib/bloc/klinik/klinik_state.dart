@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:klinik/model/access_token.dart';
+import 'package:klinik/models/access_token.dart';
 import 'package:meta/meta.dart';
 
 @immutable

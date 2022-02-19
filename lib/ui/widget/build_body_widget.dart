@@ -16,6 +16,9 @@ class BuildBodyWidget extends StatelessWidget {
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Widget? drawer;
   final Widget? endDrawer;
+  final List<Widget>? persistentFooterButtons;
+
+  final ScrollController controller = ScrollController();
 
   ///Default value is False.
   final bool swipeBackgroudColors;
@@ -26,6 +29,7 @@ class BuildBodyWidget extends StatelessWidget {
     this.swipeBackgroudColors = false,
     this.floatingActionButton,
     this.floatingActionButtonLocation,
+    this.persistentFooterButtons,
     this.drawer,
     this.endDrawer,
   }) : super(key: key);
@@ -44,6 +48,8 @@ class BuildBodyWidget extends StatelessWidget {
       drawerDragStartBehavior: DragStartBehavior.start,
       drawerEnableOpenDragGesture: false,
       endDrawerEnableOpenDragGesture: false,
+      resizeToAvoidBottomInset: true,
+      persistentFooterButtons: persistentFooterButtons,
       body: Stack(
         children: [
           Positioned(
@@ -80,6 +86,7 @@ class BuildBodyWidget extends StatelessWidget {
                     color: Colors.transparent,
                     alignment: Alignment.topCenter,
                     child: SingleChildScrollView(
+                      controller: controller,
                       physics: AlwaysScrollableScrollPhysics(),
                       child: body,
                     ),
@@ -89,6 +96,7 @@ class BuildBodyWidget extends StatelessWidget {
                     width: Core.getDefaultAppWidth(context),
                     color: Colors.transparent,
                     child: SingleChildScrollView(
+                      controller: controller,
                       physics: AlwaysScrollableScrollPhysics(),
                       child: body,
                     ),

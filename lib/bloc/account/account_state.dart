@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:klinik/model/account.dart';
+import 'package:klinik/models/account.dart';
 
 @immutable
 abstract class AccountState extends Equatable {

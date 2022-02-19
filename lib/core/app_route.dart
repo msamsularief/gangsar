@@ -15,6 +15,7 @@ class AppRoute {
   static const articles = "/articles";
   static const history = "/history";
   static const bodyMassIndex = "/bodyMassIndex";
+  static const hpl = "/hpl";
 }
 
 ///

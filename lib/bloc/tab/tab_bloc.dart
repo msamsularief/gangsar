@@ -2,7 +2,7 @@
 
 import 'package:bloc/bloc.dart';
 import 'package:klinik/bloc/tab/tab_event.dart';
-import 'package:klinik/model/app_tab.dart';
+import 'package:klinik/models/app_tab.dart';
 
 class TabBloc extends Bloc<TabEvent, AppTab> {
   TabBloc() : super(AppTab.home) {

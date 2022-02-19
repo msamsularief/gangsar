@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:klinik/helper/json_helper.dart';
-import 'package:klinik/model/account.dart';
-import 'package:klinik/model/authorize_result.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:klinik/core/storage.dart';
+import 'package:klinik/models/account.dart';
+import 'package:klinik/models/authorize_result.dart';
 
 FirebaseApp firebaseApp = Firebase.apps.single;
 FirebaseAuth auth = Auth.initial();
@@ -21,55 +18,54 @@ class Auth {
   }
 
   static Future<AuthorizeResult?> doLogin(String email, String password) async {
-    AuthorizeResult? result;
     Account account;
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    await storage.clear();
 
     try {
       UserCredential? userCredential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
       User? user = userCredential.user;
 
-      print(userCredential);
+      var token = await user!.getIdToken();
+      print('\n\nID TOKEN : $token\n\n');
 
-      if (user != null) {
-        final idToken = await user.getIdToken();
-        print('\n\nID TOKEN : $idToken\n\n');
+      // Auth().accessToken = idToken;
+      await storage.setItem('accesstoken', token);
 
-        await prefs.setString('accessToken', idToken);
+      account = Account(user.uid, user.displayName!, user.email!);
 
-        account = Account(user.displayName!, user.email!);
+      var accData = {
+        "user_id": account.userId,
+        "full_name": account.fullName,
+        "email": account.email
+      };
 
-        print("\n\n\nACCOUNT DATA $account\n\n\n");
+      //-------------------------------------------------->>>         PUT data to local.
+      await storage.setItem('currentUser', accData);
 
-        await prefs.setString(
-          'currentUser',
-          account.toMap().toString(),
-        );
-        return AuthorizeResult(account: account);
-      } else {
-        return result;
-      }
+      return AuthorizeResult(
+        account: account,
+        message: 'Logging In',
+      );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        throw AuthorizeResult(message: 'No user found for that email.');
+        return AuthorizeResult(message: 'No user found for that email.');
       } else if (e.code == 'wrong-password') {
-        throw AuthorizeResult(
+        return AuthorizeResult(
           message: 'Wrong password provided for that user.',
         );
+      } else {
+        return AuthorizeResult(message: e.message);
       }
     } catch (e) {
-      throw AuthorizeResult(
+      return AuthorizeResult(
         message: e.toString(),
       );
     }
-
-    print(result);
-    return result;
   }
 
   static Future<AuthorizeResult?> doRegister(
@@ -78,7 +74,6 @@ class Auth {
     String fullName,
     String phoneNum,
   ) async {
-    AuthorizeResult? result;
     String? errorMessage = "";
 
     try {
@@ -92,7 +87,6 @@ class Auth {
 
       User? user = userCredential.user;
 
-      // if (user != null) {
       await user!.updateDisplayName(fullName);
       await auth.verifyPhoneNumber(
         phoneNumber: phoneNum,
@@ -106,39 +100,67 @@ class Auth {
 
       user.sendEmailVerification();
 
-      // result?.message = 'Register Success';
-
-      // print("\n\n\nAUTH RESULT MESSAGE : ${result?.message}\n\n\n");
       return AuthorizeResult(message: 'Register Success');
-      // }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         errorMessage = 'The password provided is too weak.';
         return AuthorizeResult(message: errorMessage);
-        // print(errorMessage);
-        // result?.message = errorMessage;
-        // return result;
       } else if (e.code == 'email-already-in-use') {
         errorMessage = 'The account already exists for that email.';
-        print(errorMessage);
-        result?.message = errorMessage;
-        // return result;
 
         return AuthorizeResult(message: errorMessage);
       } else {
         errorMessage = e.message;
-        print(errorMessage);
-        result?.message = errorMessage;
-        // return result;
         return AuthorizeResult(message: errorMessage);
       }
     } catch (e) {
-      print('CATCHED : $e');
       errorMessage = e.toString();
-      result?.message = errorMessage;
       return AuthorizeResult(message: errorMessage);
     }
-    // result?.message = 'cannot get User data from server !';
-    // return result;
+  }
+
+  static Future doLogout() async {
+    await auth.signOut();
+    await storage.clear();
+  }
+
+  ///GET user info from local.
+  static Future<Account> getMeInfo() async {
+    Map<String, dynamic> user = await storage.getItem('currentUser');
+    print("USER [GET ME INFO] : $user");
+    print("MAP [GET ME INFO] : ${user['user_id']}");
+    return Account.fromMap(user);
+  }
+
+  ///Check for the Users has accessToken or not.
+  static Future<bool> hasAccessToken() async {
+    String? token = await getAccessToken();
+    bool has = false;
+    if (token != null) {
+      return has = true;
+    }
+    return has;
+  }
+
+  ///Get the newest `token`.
+  static Future<String?> getAccessToken() async {
+    User? user = auth.currentUser;
+    if (user != null) {
+      String? currentToken = await user.getIdToken(true);
+
+      if (currentToken.isNotEmpty) {
+        var token = storage.getItem('accessToken');
+        if (currentToken != token) {
+          await storage.setItem('accessToken', currentToken);
+          return currentToken;
+        } else {
+          return token!;
+        }
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 }

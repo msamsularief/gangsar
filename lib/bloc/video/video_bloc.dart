@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:klinik/bloc/video/video.dart';
 import 'package:klinik/helper/video_helper.dart';
-import 'package:klinik/model/video.dart';
+import 'package:klinik/models/video.dart';
 
 class VideoBloc extends Bloc<VideoEvent, VideoState> {
   VideoState get initialState => VideoLoading();

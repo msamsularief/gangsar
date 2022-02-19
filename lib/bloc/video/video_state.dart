@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:klinik/model/video.dart';
+import 'package:klinik/models/video.dart';
 import 'package:meta/meta.dart';
 
 @immutable

@@ -1,31 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:klinik/bloc/chart/chart_bloc.dart';
+import 'package:klinik/core/core.dart';
+import 'package:klinik/models/chart.dart';
 import 'package:klinik/ui/widget/bmi/bmi_chart_widget.dart';
-import 'package:klinik/ui/widget/klinik_appbar.dart';
 
-class BmiHistoryPage extends StatelessWidget {
-  const BmiHistoryPage({Key? key}) : super(key: key);
+///Build untuk tampilan setelah ada data `Index Masa Tubuh ( IMT )`nya.
+///ini menampilkan :
+/// - Informasi `IMT` terakhir dari pengguna
+/// - Informasi Chart dari semua riwayat awal perhitungan `IMT` hingga minggu terakhir (42 minggu)
+/// - Informasi Table indikasi perhitungan `IMT`
+class BmiView extends StatelessWidget {
+  final ChartBloc chartBloc;
+  final List<Chart> items;
+  const BmiView({Key? key, required this.chartBloc, required this.items})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: KlinikAppBar(
-        title: "Riwayat",
-      ),
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        physics: const ClampingScrollPhysics(),
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            _text(context, "Riwayat index masa tubuh Anda."),
-            // BmiChartWidget(),
-            _buildTable(context),
-          ],
+    return Column(
+      children: [
+        _buildCard(
+          child: SizedBox(
+            width: Core.getDefaultAppWidth(context),
+            child: Column(
+              children: [
+                Text(
+                  "Index masa tubuh terakhir Anda adalah :",
+                  style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
+                SizedBox(
+                  height: 16.0,
+                ),
+                Text(
+                  items.last.massIndex,
+                  style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                        fontSize: 48.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                SizedBox(
+                  height: 16.0,
+                ),
+              ],
+            ),
+          ),
         ),
-      ),
+        _buildCard(
+          child: Column(
+            children: [
+              BmiChartWidget(
+                items: items,
+              ),
+              SizedBox(
+                height: 16.0,
+              ),
+              _buildTable(context),
+            ],
+          ),
+          margin: EdgeInsets.only(top: 20.0),
+          topPadding: 24.0,
+        ),
+      ],
     );
   }
 
+  ///Build untuk menampilkan `Tabel` keterangan `Index Masa Tubuh`, baik itu
+  ///sudah ideal, kurang atau over.
   Widget _buildTable(BuildContext context) {
     final List<int> chartLines = [for (var i = 1; i <= 4; i++) i];
     final List<String> imtItems = [
@@ -51,7 +94,7 @@ class BmiHistoryPage extends StatelessWidget {
     );
 
     final Map<int, TableColumnWidth> tableColumnWidth = {
-      // 0: FractionColumnWidth(.26),
+      0: FractionColumnWidth(.12),
       // 1: FractionColumnWidth(.34),
     };
 
@@ -159,6 +202,41 @@ class BmiHistoryPage extends StatelessWidget {
       ],
     );
   }
+
+  ///Untuk membuild `Base Card` agar tampilan lebih tertata.
+  Widget _buildCard(
+          {required Widget? child,
+          EdgeInsetsGeometry? margin,
+          double? topPadding}) =>
+      Container(
+        margin: margin,
+        padding: EdgeInsets.fromLTRB(
+          20.0,
+          topPadding ?? 40.0,
+          20.0,
+          20.0,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 8.0,
+              blurStyle: BlurStyle.solid,
+              color: Colors.purple.shade100.withOpacity(0.2),
+              offset: Offset(1.0, 0.8),
+              spreadRadius: 2,
+            ),
+            BoxShadow(
+              blurRadius: 8.0,
+              blurStyle: BlurStyle.solid,
+              color: Colors.blueGrey.shade200.withOpacity(0.2),
+              offset: Offset(1.8, 2.8),
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: child,
+      );
 
   Widget _text(
     BuildContext context,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:klinik/api/auth.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/core/image_initial.dart';
@@ -102,10 +103,16 @@ class HomeMenuItemPage extends StatelessWidget {
       itemBuilder: (context, index) {
         String label = items[index];
         return CustomButton.defaultButton(
-          onPressed: () {
+          onPressed: () async {
             print("\n\nLABEL : $label\n\n");
             if (label.toLowerCase() == "index masa tubuh") {
-              navigateTo(AppRoute.bodyMassIndex);
+              var account = await Auth.getMeInfo();
+              print("THIS IS ACCOUNT [BMI] : $account");
+              navigateTo(AppRoute.bodyMassIndex, arguments: account);
+            } else if (label.toLowerCase() == "hari perkiraan lahir") {
+              // var account = await Auth.getMeInfo();
+              // print("THIS IS ACCOUNT [BMI] : $account");
+              navigateTo(AppRoute.hpl);
             }
           },
           title: label,

@@ -1,18 +1,15 @@
-import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:klinik/api/auth.dart';
 import 'package:klinik/bloc/account/account.dart';
 import 'package:klinik/bloc/klinik/klinik_bloc.dart';
-import 'package:klinik/model/account.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:klinik/models/account.dart';
 
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final KlinikBloc klinikBloc;
-  final SharedPreferences prefs;
 
   AccountBloc({
     required this.klinikBloc,
-    required this.prefs,
   }) : super(AccountLoading()) {
     on<AccountEvent>((event, emit) => emit(AccountLoading()));
     on<CreateAccount>((event, emit) async {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:klinik/core/core.dart';
-import 'package:klinik/model/article.dart';
-import 'package:klinik/model/image_component.dart';
+import 'package:klinik/models/article.dart';
+import 'package:klinik/models/image_component.dart';
 import 'package:klinik/ui/widget/image_builder.dart';
 import 'package:klinik/ui/widget/klinik_appbar.dart';
 

@@ -5,7 +5,7 @@ import 'package:klinik/bloc/klinik/klinik_bloc.dart';
 import 'package:klinik/bloc/tab/tab_bloc.dart';
 import 'package:klinik/bloc/tab/tab_event.dart';
 import 'package:klinik/core/core.dart';
-import 'package:klinik/model/app_tab.dart';
+import 'package:klinik/models/app_tab.dart';
 import 'package:klinik/ui/widget/home_widget/home_appbar_widget.dart';
 import 'package:klinik/ui/widget/home_widget/home_drawer_widget.dart';
 import 'package:klinik/ui/screen/home/home_page.dart';

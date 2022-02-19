@@ -6,7 +6,7 @@ import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/core/image_initial.dart';
 import 'package:klinik/helper/video_helper.dart';
-import 'package:klinik/model/video.dart';
+import 'package:klinik/models/video.dart';
 import 'package:klinik/bloc/video/video.dart';
 
 class VideoListWidget extends StatelessWidget {
@@ -72,6 +72,7 @@ class VideoListWidget extends StatelessWidget {
 
   Widget _buildList(BuildContext context, double height) {
     List<String> urls = [];
+    List<Video> videos = [];
 
     if (videoUrls.length > 5) {
       for (var i = 0; i <= 4; i++) {
@@ -100,36 +101,42 @@ class VideoListWidget extends StatelessWidget {
       ),
     );
 
-    return ListView.builder(
-      itemCount: urls.length,
+    return ListView(
       shrinkWrap: true,
       scrollDirection: Axis.horizontal,
       physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
+      children: urls.map((e) {
+        int index = urls.indexOf(e);
         String videoThumbnail = VideoHelper.getVideoThumbnail(
-          urls[index],
+          e,
         );
 
-        String? videoId = VideoHelper.getVideoId(urls[index]);
+        String? videoId = VideoHelper.getVideoId(e);
 
         return BlocProvider(
-          create: (context) => VideoBloc()..add(GetVideoDetail(urls[index])),
+          create: (context) => VideoBloc()..add(GetVideoDetail(e)),
           child: BlocBuilder<VideoBloc, VideoState>(
             builder: (context, state) {
               if (state is VideoLoading) {
                 return _loading;
               } else if (state is VideoLoaded) {
                 video = state.item;
+                videos.add(video!);
               }
+
+              print("VIDEO TITLE : ${video!.title}");
 
               if (video != null) {
                 return GestureDetector(
-                  onTap: () {
-                    navigateTo("/video_player", arguments: [
-                      videoId,
-                      Video(video!.title, video!.author),
-                    ]);
-                  },
+                  key: ValueKey(videoId),
+                  onTap: state is VideoLoading
+                      ? () {}
+                      : () {
+                          navigateTo("/video_player", arguments: [
+                            videoId,
+                            Video(videos[index].title, videos[index].author),
+                          ]);
+                        },
                   child: _imageBuilder(
                     context,
                     videoThumbnail,
@@ -150,7 +157,7 @@ class VideoListWidget extends StatelessWidget {
             },
           ),
         );
-      },
+      }).toList(),
     );
   }
 

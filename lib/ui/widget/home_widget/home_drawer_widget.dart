@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
-import 'package:klinik/model/app_info.dart';
+import 'package:klinik/models/app_info.dart';
 import 'package:klinik/ui/widget/sidebar_menu_item.dart';
 
 Widget buildHomeDrawer(BuildContext context) {

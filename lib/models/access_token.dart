@@ -10,10 +10,10 @@ class AccessToken extends Equatable {
   );
 
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> data = Map();
+    Map<String, dynamic> data = {};
 
     // data["account_id"] = this.accountId;
-    data["token"] = this.token;
+    data["token"] = token;
     return data;
   }
 

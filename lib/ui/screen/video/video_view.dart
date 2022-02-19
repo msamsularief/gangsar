@@ -5,8 +5,8 @@ import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/core/image_initial.dart';
 import 'package:klinik/helper/video_helper.dart';
-import 'package:klinik/model/video.dart';
-import 'package:klinik/model/image_component.dart';
+import 'package:klinik/models/video.dart';
+import 'package:klinik/models/image_component.dart';
 import 'package:klinik/ui/screen/video/video_item_view.dart';
 import 'package:klinik/ui/widget/video_player/video_items.dart';
 

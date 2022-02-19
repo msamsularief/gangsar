@@ -70,7 +70,10 @@ class _RegisterPageState extends State<RegisterPage> {
             FlashBar.showError(context, message: state.error);
           } else if (state is RegisterSuccess) {
             FlashBar.showOnSucess(context, message: state.message!);
-            navigateAndReplace(AppRoute.login);
+            Future.delayed(
+              Duration(microseconds: 500),
+              () => navigateAndReplace(AppRoute.login),
+            );
           }
         },
         child: _buildBody(context, registerBloc),

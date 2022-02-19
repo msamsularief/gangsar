@@ -28,6 +28,7 @@ class CustomFormField extends StatelessWidget {
   final Function(String)? onFieldSubmitted;
   final Function(String?)? onSaved;
   final bool autoFocus;
+  final Iterable<String>? autofillHints;
 
   const CustomFormField({
     Key? key,
@@ -56,12 +57,16 @@ class CustomFormField extends StatelessWidget {
     this.onFieldSubmitted,
     this.onSaved,
     this.autoFocus = false,
+    this.autofillHints,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      onEditingComplete: onEditingComplete,
+      onEditingComplete: onEditingComplete ??
+          () => TextInput.finishAutofillContext(
+                shouldSave: true,
+              ),
       onFieldSubmitted: onFieldSubmitted,
       onSaved: onSaved,
       onTap: onTap,
@@ -93,6 +98,7 @@ class CustomFormField extends StatelessWidget {
       enableInteractiveSelection: true,
       maxLines: maxLines ?? 1,
       readOnly: readOnly,
+      autofillHints: autofillHints,
       initialValue: value,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.only(

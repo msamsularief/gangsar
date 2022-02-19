@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:klinik/api/auth.dart';
+import 'package:klinik/core/storage.dart';
+import 'package:klinik/models/authorize_result.dart';
 import '../klinik/klinik.dart';
 import 'login.dart';
 
@@ -14,20 +16,30 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(LoginLoading());
 
       try {
-        final result = await Auth.doLogin(event.email, event.password);
+        AuthorizeResult? result = await Auth.doLogin(
+          event.email,
+          event.password,
+        );
 
-        // final data = prefs.getString('currentUser');
         print('\n\n\nACCOUNT : ${result?.account}\n\n\n');
 
         if (result != null) {
-          klinikBloc.add(LoggedIn());
-          print("Logged In");
-          emit(LoginSuccess(result.account));
+          if (result.account != null) {
+            final token = await storage.getItem('accessToken');
+
+            print('AccessToken = $token');
+            klinikBloc.add(LoggedIn());
+            print("Logged In");
+            emit(LoginSuccess(result.account));
+          } else {
+            emit(LoginFailure(error: result.message!));
+          }
         } else {
-          emit(LoginFailure(error: "Cannot get new session"));
+          emit(LoginFailure(error: "cannot get data from server !"));
         }
       } catch (e) {
-        emit(LoginFailure(error: e.toString()));
+        e as AuthorizeResult;
+        emit(LoginFailure(error: e.message.toString()));
       }
     });
   }

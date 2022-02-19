@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:klinik/model/account.dart';
+import 'package:klinik/models/account.dart';
 import 'package:meta/meta.dart';
 
 @immutable
@@ -33,5 +33,5 @@ class LoginFailure extends LoginState {
   LoginFailure({required this.error});
 
   @override
-  String toString() => "Login Failure";
+  String toString() => "Login Failure : Error $error";
 }
