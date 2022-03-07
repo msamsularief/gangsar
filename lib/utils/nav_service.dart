@@ -25,7 +25,8 @@ class NavigationService {
   ///**[navigateAndRemoveUntil]** digunakan hanya ketika [currentState] tidak ingin dibuka kembali,
   ///misal: *dari State Login menuju ke Home*.
   ///
-  Future<dynamic> navigateAndRemoveUntil(String routeName, {Object? arguments}) {
+  Future<dynamic> navigateAndRemoveUntil(String routeName,
+      {Object? arguments}) {
     return navigatorKey.currentState!.pushNamedAndRemoveUntil(
       routeName,
       (route) => false,
@@ -46,7 +47,7 @@ class NavigationService {
 
   ///Untuk me-**navigasi** ke halaman sebelumnya.
   ///Penggunaannya sama dengan *Navigator.pop(context)*
-  void goBack() {
-    return navigatorKey.currentState!.pop();
+  void goBack<T extends Object?>([T? result]) {
+    return navigatorKey.currentState!.pop(result);
   }
 }

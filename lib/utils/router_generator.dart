@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:klinik/bloc/account/account.dart';
 import 'package:klinik/bloc/klinik/klinik_bloc.dart';
 import 'package:klinik/bloc/login/login_bloc.dart';
 import 'package:klinik/bloc/register/register.dart';
@@ -13,10 +14,13 @@ import 'package:klinik/ui/screen/article/article_detail_page.dart';
 import 'package:klinik/ui/screen/article/article_page.dart';
 import 'package:klinik/ui/screen/bmi/bmi_history_page.dart';
 import 'package:klinik/ui/screen/bmi/bmi_page.dart';
+import 'package:klinik/ui/screen/booking/booking_page.dart';
+import 'package:klinik/ui/screen/booking/choose_doctor.dart';
 import 'package:klinik/ui/screen/history/history_page.dart';
 import 'package:klinik/ui/screen/home/home_menu_item_page.dart';
 import 'package:klinik/ui/screen/forgot_password/forgot_password.dart';
 import 'package:klinik/ui/screen/forgot_password/verify_forgot_password.dart';
+import 'package:klinik/ui/screen/hpht/hpht_page.dart';
 import 'package:klinik/ui/screen/hpl/hpl_page.dart';
 import 'package:klinik/ui/screen/login/login_page.dart';
 import 'package:klinik/ui/screen/profile/detail_profile_page.dart';
@@ -141,6 +145,27 @@ class RouterGenerator {
       //     video: videoData,
       //   ),
       // );
+      case AppRoute.hpht:
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider<AccountBloc>(
+            create: (context) => AccountBloc(
+              klinikBloc: klinikBloc,
+            )..add(
+                LoadDetailAccount(),
+              ),
+            child: HphtPage(),
+          ),
+        );
+      case AppRoute.booking:
+        return MaterialPageRoute(
+          builder: (context) => BookingPage(),
+        );
+      case AppRoute.chooseDoctor:
+        List<String> items = settings.arguments as List<String>;
+        print(settings.arguments);
+        return MaterialPageRoute(
+          builder: (context) => ChooseDoctor(items: items),
+        );
       case "/bmi_history":
         return MaterialPageRoute(
           builder: (context) => BmiHistoryPage(),

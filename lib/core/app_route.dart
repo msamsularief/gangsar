@@ -16,6 +16,10 @@ class AppRoute {
   static const history = "/history";
   static const bodyMassIndex = "/bodyMassIndex";
   static const hpl = "/hpl";
+  static const booking = "/booking";
+  static const chooseDoctor = "/choose_doctor";
+  static const hpht = "/hpht";
+  
 }
 
 ///
@@ -40,4 +44,5 @@ navigateAndReplace(String routeName) => locator<NavigationService>().moveTo(
     );
 
 ///Routing ke halaman sebelumnya.
-goBack() => locator<NavigationService>().goBack();
+goBack<T extends Object?>([T? result]) =>
+    locator<NavigationService>().goBack(result);

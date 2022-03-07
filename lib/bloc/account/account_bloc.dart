@@ -1,4 +1,3 @@
-
 import 'package:bloc/bloc.dart';
 import 'package:klinik/api/auth.dart';
 import 'package:klinik/bloc/account/account.dart';
@@ -12,25 +11,39 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     required this.klinikBloc,
   }) : super(AccountLoading()) {
     on<AccountEvent>((event, emit) => emit(AccountLoading()));
-    on<CreateAccount>((event, emit) async {
+    // on<CreateAccount>((event, emit) async {
+    //   emit(AccountLoading());
+    //   try {
+    //     Account? account;
+    //     var result = await Auth.doRegister(
+    //       event.email,
+    //       event.password,
+    //       event.userName,
+    //       event.phoneNum,
+    //     );
+
+    //     if (account != null) {
+    //       print(account);
+    //     } else {
+    //       print('account is null');
+    //       emit(AccountFailure(error: 'Error'));
+    //     }
+    //   } catch (e) {
+    //     print(e);
+    //     emit(AccountFailure(error: e.toString()));
+    //   }
+    // });
+    on<LoadDetailAccount>((event, emit) async {
       emit(AccountLoading());
       try {
-        Account? account;
-        var result = await Auth.doRegister(
-          event.email,
-          event.password,
-          event.userName,
-          event.phoneNum,
-        );
-
-        if (account != null) {
-          print(account);
+        Account data = await Auth.getMeInfo();
+        print(data);
+        if (data.props.isNotEmpty) {
+          emit(AccountDetailLoaded(data));
         } else {
-          print('account is null');
-          emit(AccountFailure(error: 'Error'));
+          emit(AccountFailure(error: "tidak dapat memuat data !"));
         }
       } catch (e) {
-        print(e);
         emit(AccountFailure(error: e.toString()));
       }
     });

@@ -87,13 +87,15 @@ class Imagebuilder extends StatelessWidget {
       errorWidget: (context, url, error) => Container(
         decoration: BoxDecoration(
           borderRadius: borderRadius ?? BorderRadius.circular(16.0),
-          color: Colors.white,
+          color: Colors.grey.shade400,
         ),
+        alignment: Alignment.center,
         padding: EdgeInsets.all(16.0),
         width: width,
         height: height,
-        child: Text(
-          "Error when load image from\n$url\n$error",
+        child: Icon(
+          Icons.error_outline_rounded,
+          color: Colors.grey.shade500,
         ),
       ),
       progressIndicatorBuilder: (context, url, progress) => Container(

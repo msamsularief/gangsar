@@ -9,6 +9,9 @@ class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   ///Jika [child] tidak kosong, maka [title] tidak akan ditampilkan.
   final String? title;
+
+  ///default-nya adalah **40.0**
+  final double? titleTextSize;
   final PreferredSizeWidget? bottom;
   final bool? centerTitle;
   final bool automaticallyImplyLeading;
@@ -28,6 +31,7 @@ class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions,
     this.leading,
     this.title,
+    this.titleTextSize,
     this.bottom,
     this.centerTitle,
     this.automaticallyImplyLeading = true,
@@ -94,8 +98,8 @@ class KlinikAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: child ??
             Text(
               title!,
-              style: const TextStyle(
-                fontSize: 40.0,
+              style: TextStyle(
+                fontSize: titleTextSize ?? 40.0,
               ),
             ),
         titleSpacing: titleSpacing,

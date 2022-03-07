@@ -113,6 +113,8 @@ class HomeMenuItemPage extends StatelessWidget {
               // var account = await Auth.getMeInfo();
               // print("THIS IS ACCOUNT [BMI] : $account");
               navigateTo(AppRoute.hpl);
+            } else if (label.toLowerCase() == "hpht") {
+              navigateTo(AppRoute.hpht);
             }
           },
           title: label,

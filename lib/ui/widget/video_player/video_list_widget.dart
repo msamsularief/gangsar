@@ -157,7 +157,7 @@ class VideoListWidget extends StatelessWidget {
             },
           ),
         );
-      }).toList(),
+      }).toList(growable: false),
     );
   }
 
