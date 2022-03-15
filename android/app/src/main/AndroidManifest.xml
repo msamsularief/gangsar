@@ -3,6 +3,9 @@
    <application
         android:label="Gangsar O"
         android:icon="@mipmap/launcher_icon">
+        <!-- Setup Google Maps -->
+        <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="YOUR_API_KEY"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

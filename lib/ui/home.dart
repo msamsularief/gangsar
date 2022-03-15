@@ -6,6 +6,7 @@ import 'package:klinik/bloc/tab/tab_bloc.dart';
 import 'package:klinik/bloc/tab/tab_event.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/models/app_tab.dart';
+import 'package:klinik/ui/screen/map/map_page.dart';
 import 'package:klinik/ui/widget/home_widget/home_appbar_widget.dart';
 import 'package:klinik/ui/widget/home_widget/home_drawer_widget.dart';
 import 'package:klinik/ui/screen/home/home_page.dart';
@@ -76,6 +77,10 @@ class _HomeState extends State<Home> {
       builder: (context, activeTab) {
         Widget? body;
         String? title;
+
+        // Default screen akan berbentuk list
+        bool listViewEnabled = true;
+
         if (activeTab == AppTab.home) {
           body = const HomePage();
         } else if (activeTab == AppTab.videos) {
@@ -87,6 +92,10 @@ class _HomeState extends State<Home> {
             klinikBloc: widget.klinikBloc,
           );
           title = "Profile";
+        } else if (activeTab == AppTab.maps) {
+          body = MapPage();
+          title = "Maps";
+          listViewEnabled = false;
         } else {
           body = Center(
             child: Text("This Is Body of ${activeTab.toString()}"),
@@ -112,13 +121,15 @@ class _HomeState extends State<Home> {
                   : null,
               child: SizedBox(
                 height: Core.getDefaultBodyHeight(context) - appbarHeight,
-                child: ListView(
-                  controller: _scrollController,
-                  physics: ClampingScrollPhysics(),
-                  children: [
-                    body!,
-                  ],
-                ),
+                child: listViewEnabled
+                    ? ListView(
+                        controller: _scrollController,
+                        physics: ClampingScrollPhysics(),
+                        children: [
+                          body!,
+                        ],
+                      )
+                    : body!,
               ),
             ),
           ),
