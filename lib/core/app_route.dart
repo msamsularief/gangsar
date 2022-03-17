@@ -19,7 +19,7 @@ class AppRoute {
   static const booking = "/booking";
   static const chooseDoctor = "/choose_doctor";
   static const hpht = "/hpht";
-  
+  static const chatDetail = "/chat_detail";
 }
 
 ///

@@ -16,6 +16,7 @@ import 'package:klinik/ui/screen/bmi/bmi_history_page.dart';
 import 'package:klinik/ui/screen/bmi/bmi_page.dart';
 import 'package:klinik/ui/screen/booking/booking_page.dart';
 import 'package:klinik/ui/screen/booking/choose_doctor.dart';
+import 'package:klinik/ui/screen/chats/chat_detail_page.dart';
 import 'package:klinik/ui/screen/history/history_page.dart';
 import 'package:klinik/ui/screen/home/home_menu_item_page.dart';
 import 'package:klinik/ui/screen/forgot_password/forgot_password.dart';
@@ -178,6 +179,8 @@ class RouterGenerator {
             article: article,
           ),
         );
+      case AppRoute.chatDetail:
+        return MaterialPageRoute(builder: (context) => ChatDetailPage());
       default:
         return _errorRoute();
     }
