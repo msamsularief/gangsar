@@ -19,7 +19,7 @@ void popupWidget(BuildContext context, KlinikBloc klinikBloc) {
             buttonDefaultColor: Color.fromARGB(255, 246, 246, 246),
             onPressed: () {
               klinikBloc.add(LoggedOut());
-              navigateAndRemoveUntil(AppRoute.login);
+              navigateAndRemoveUntil(AppRoute.selectRole);
             },
           ),
           SizedBox(

@@ -87,7 +87,7 @@ class BuildBodyWidget extends StatelessWidget {
                     alignment: Alignment.topCenter,
                     child: SingleChildScrollView(
                       controller: controller,
-                      physics: AlwaysScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                       child: body,
                     ),
                   )
@@ -97,7 +97,7 @@ class BuildBodyWidget extends StatelessWidget {
                     color: Colors.transparent,
                     child: SingleChildScrollView(
                       controller: controller,
-                      physics: AlwaysScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                       child: body,
                     ),
                   ),

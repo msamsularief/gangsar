@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 Widget cardWidget(
         {EdgeInsetsGeometry? padding,
         EdgeInsetsGeometry? margin,
+        Color? backgroundColor,
         required Widget child,
         VoidCallback? onTap}) =>
     GestureDetector(
@@ -10,7 +11,7 @@ Widget cardWidget(
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.0),
-          color: Colors.white,
+          color: backgroundColor ?? Colors.white,
           boxShadow: const [
             BoxShadow(
               color: Colors.black26,

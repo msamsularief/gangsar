@@ -8,6 +8,7 @@ import 'package:klinik/bloc/tab/tab_bloc.dart';
 import 'package:klinik/core/app_route.dart';
 import 'package:klinik/models/account.dart';
 import 'package:klinik/models/article.dart';
+import 'package:klinik/models/event.dart';
 import 'package:klinik/models/video.dart';
 import 'package:klinik/ui/home.dart';
 import 'package:klinik/ui/screen/article/article_detail_page.dart';
@@ -16,6 +17,9 @@ import 'package:klinik/ui/screen/bmi/bmi_history_page.dart';
 import 'package:klinik/ui/screen/bmi/bmi_page.dart';
 import 'package:klinik/ui/screen/booking/booking_page.dart';
 import 'package:klinik/ui/screen/booking/choose_doctor.dart';
+import 'package:klinik/ui/screen/doctor/home_doctor/home_doctor.dart';
+import 'package:klinik/ui/screen/doctor/hpht_doctor/hpht_doctor_page.dart';
+import 'package:klinik/ui/screen/doctor/login_doctor/login_doctor_page.dart';
 import 'package:klinik/ui/screen/history/history_page.dart';
 import 'package:klinik/ui/screen/home/home_menu_item_page.dart';
 import 'package:klinik/ui/screen/forgot_password/forgot_password.dart';
@@ -26,6 +30,7 @@ import 'package:klinik/ui/screen/login/login_page.dart';
 import 'package:klinik/ui/screen/profile/detail_profile_page.dart';
 import 'package:klinik/ui/screen/profile/profile_page.dart';
 import 'package:klinik/ui/screen/register/register_page.dart';
+import 'package:klinik/ui/screen/role/selec_role.dart';
 import 'package:klinik/ui/screen/video/video_page.dart';
 import 'package:klinik/ui/widget/klinik_appbar.dart';
 import 'package:klinik/ui/widget/video_player/video_player.dart';
@@ -48,12 +53,36 @@ class RouterGenerator {
             child: Home(klinikBloc: klinikBloc),
           ),
         );
+      case AppRoute.homeDoctor:
+        return MaterialPageRoute(
+          builder: (context) => const HomeDoctor(),
+        );
+      case AppRoute.hphtDoctor:
+        final data = settings.arguments as Event;
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider<AccountBloc>(
+            create: (context) => AccountBloc(
+              klinikBloc: klinikBloc,
+            )..add(
+                LoadDetailAccount(),
+              ),
+            child: HphtDoctorPage(item: data),
+          ),
+        );
       case AppRoute.login:
         return MaterialPageRoute(
           builder: (context) => BlocProvider(
             create: (context) => LoginBloc(klinikBloc: klinikBloc),
             child: const LoginPage(),
           ),
+        );
+      case AppRoute.loginDoctor:
+        return MaterialPageRoute(
+          builder: (context) => const LoginDoctorPage(),
+        );
+      case AppRoute.selectRole:
+        return MaterialPageRoute(
+          builder: (context) => const SelectRole(),
         );
       case AppRoute.register:
         return MaterialPageRoute(

@@ -60,7 +60,7 @@ class KlinikApp extends StatelessWidget {
             navigateAndReplace(AppRoute.home);
           }
           if (state is AuthenticationUnauthenticated) {
-            navigateAndReplace(AppRoute.login);
+            navigateAndReplace(AppRoute.selectRole);
           }
         },
         child: Splash(),

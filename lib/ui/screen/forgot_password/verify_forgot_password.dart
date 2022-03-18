@@ -87,9 +87,9 @@ class _VerifyForgotPasswordPageState extends State<VerifyForgotPasswordPage> {
                       titleFontWeight: FontWeight.bold,
                       width: Core.getDefaultAppWidth(context),
                       height: 48.0,
-                      onPressed: () => navigateAndRemoveUntil(
-                        AppRoute.login,
-                      ),
+                      onPressed: () {
+                        goBack();
+                      },
                     ),
                   ],
                 ),

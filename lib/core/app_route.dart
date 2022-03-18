@@ -2,9 +2,11 @@ import 'package:klinik/utils/locator.dart';
 import 'package:klinik/utils/nav_service.dart';
 
 class AppRoute {
+  //----------------------------------------------------> PASIEN
   static const home = "/home";
   static const login = "/login";
   static const register = "/register";
+  static const selectRole = "/select_role";
   static const profile = "/profile";
   static const detailProfile = "/detail_profile";
   static const logout = "/logout";
@@ -19,7 +21,11 @@ class AppRoute {
   static const booking = "/booking";
   static const chooseDoctor = "/choose_doctor";
   static const hpht = "/hpht";
-  
+
+  //----------------------------------------------------> DOCTER
+  static const hphtDoctor = "/hpht_doctor";
+  static const homeDoctor = "/home_doctor";
+  static const loginDoctor = "/login_doctor";
 }
 
 ///
