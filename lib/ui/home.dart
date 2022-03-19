@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:klinik/bloc/klinik/klinik_bloc.dart';
 import 'package:klinik/bloc/tab/tab_bloc.dart';
 import 'package:klinik/bloc/tab/tab_event.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/models/app_tab.dart';
+import 'package:klinik/ui/screen/chats/chat_list_page.dart';
+import 'package:klinik/ui/screen/map/map_page.dart';
 import 'package:klinik/ui/widget/home_widget/home_appbar_widget.dart';
 import 'package:klinik/ui/widget/home_widget/home_drawer_widget.dart';
 import 'package:klinik/ui/screen/home/home_page.dart';
@@ -13,6 +16,7 @@ import 'package:klinik/ui/screen/profile/profile_page.dart';
 import 'package:klinik/ui/screen/video/video_view.dart';
 import 'package:klinik/ui/widget/build_body_widget.dart';
 import 'package:klinik/ui/widget/tab_selector.dart';
+import 'package:location/location.dart';
 
 class Home extends StatefulWidget {
   final KlinikBloc klinikBloc;
@@ -24,6 +28,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late ScrollController _scrollController;
+  late Location _location = Location();
   bool _show = true;
   bool isScrolllingDown = false;
   bool isScrollingRight = false;
@@ -31,6 +36,7 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     _scrollController = ScrollController();
+    _checkGps();
     super.initState();
     myScrollController(_scrollController);
   }
@@ -39,6 +45,13 @@ class _HomeState extends State<Home> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  // Check GPS permission
+  _checkGps() async {
+    if (!await _location.serviceEnabled()) {
+      _location.requestService();
+    }
   }
 
   ///Untuk menampilkan FAB
@@ -76,6 +89,10 @@ class _HomeState extends State<Home> {
       builder: (context, activeTab) {
         Widget? body;
         String? title;
+
+        // Default screen akan berbentuk list
+        bool listViewEnabled = true;
+
         if (activeTab == AppTab.home) {
           body = const HomePage();
         } else if (activeTab == AppTab.videos) {
@@ -87,6 +104,13 @@ class _HomeState extends State<Home> {
             klinikBloc: widget.klinikBloc,
           );
           title = "Profile";
+        } else if (activeTab == AppTab.maps) {
+          body = MapPage();
+          title = "Maps";
+          listViewEnabled = false;
+        } else if (activeTab == AppTab.chats) {
+          body = ChatListPage();
+          title = "Chats";
         } else {
           body = Center(
             child: Text("This Is Body of ${activeTab.toString()}"),
@@ -112,13 +136,15 @@ class _HomeState extends State<Home> {
                   : null,
               child: SizedBox(
                 height: Core.getDefaultBodyHeight(context) - appbarHeight,
-                child: ListView(
-                  controller: _scrollController,
-                  physics: ClampingScrollPhysics(),
-                  children: [
-                    body!,
-                  ],
-                ),
+                child: listViewEnabled
+                    ? ListView(
+                        controller: _scrollController,
+                        physics: ClampingScrollPhysics(),
+                        children: [
+                          body!,
+                        ],
+                      )
+                    : body!,
               ),
             ),
           ),

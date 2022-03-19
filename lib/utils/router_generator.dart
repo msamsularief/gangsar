@@ -20,6 +20,7 @@ import 'package:klinik/ui/screen/booking/choose_doctor.dart';
 import 'package:klinik/ui/screen/doctor/home_doctor/home_doctor.dart';
 import 'package:klinik/ui/screen/doctor/hpht_doctor/hpht_doctor_page.dart';
 import 'package:klinik/ui/screen/doctor/login_doctor/login_doctor_page.dart';
+import 'package:klinik/ui/screen/chats/chat_detail_page.dart';
 import 'package:klinik/ui/screen/history/history_page.dart';
 import 'package:klinik/ui/screen/home/home_menu_item_page.dart';
 import 'package:klinik/ui/screen/forgot_password/forgot_password.dart';
@@ -207,6 +208,8 @@ class RouterGenerator {
             article: article,
           ),
         );
+      case AppRoute.chatDetail:
+        return MaterialPageRoute(builder: (context) => ChatDetailPage());
       default:
         return _errorRoute();
     }

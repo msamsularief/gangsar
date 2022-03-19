@@ -26,6 +26,7 @@ class AppRoute {
   static const hphtDoctor = "/hpht_doctor";
   static const homeDoctor = "/home_doctor";
   static const loginDoctor = "/login_doctor";
+  static const chatDetail = "/chat_detail";
 }
 
 ///
