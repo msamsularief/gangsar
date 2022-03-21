@@ -1,288 +1,210 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:klinik/bloc/account/account.dart';
-import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
+import 'package:klinik/helper/color_helper.dart';
 import 'package:klinik/helper/date_formatter.dart';
-import 'package:klinik/models/account.dart';
 import 'package:klinik/ui/widget/build_body_widget.dart';
 import 'package:klinik/ui/widget/custom_button.dart';
+import 'package:klinik/ui/widget/custom_form_field.dart';
+import 'package:klinik/ui/widget/form_focus_node.dart';
 import 'package:klinik/ui/widget/klinik_appbar.dart';
 
 class HphtPage extends StatefulWidget {
   const HphtPage({Key? key}) : super(key: key);
 
   @override
-  _HphtPageState createState() => _HphtPageState();
+  State<HphtPage> createState() => _HphtPageState();
 }
 
 class _HphtPageState extends State<HphtPage> {
-  bool isChecked = false;
-  List<HphtChecker> checkers = [];
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _lastHaidController = TextEditingController();
+  final TextEditingController _longHaidController = TextEditingController();
+  final FocusNode _longHaidFocus = FocusNode();
+  final FocusNode _submitFocus = FocusNode();
 
-  final List<String> chartLines = [
-    "Timbang",
-    "Ukur Lingkar Lengan Atas",
-    "Tekanan Darah",
-    "Periksa Tinggi Rahim",
-    "Periksa Letak dan Denyut Jantung Janin",
-    "Status dan Imunisasi Tetanus",
-    "Konseling",
-    "Skrining Dokter",
-    "Tablet Tambah Darah",
-    "Test Lab Hemoglobin (Hb)",
-    "Test Golongan Darah",
-    "Test Lab Protein Urine",
-    "Test Lab Gula Darah",
-    "PPIA",
-    "Tata Laksana Kasus",
-  ];
+  bool textIsEmpty = false;
+
+  DateTime? initialDate;
+  DateTime? initialFirstDate;
+  DateTime? initialLastDate;
+  DateTime? currentDate;
 
   @override
   void initState() {
     super.initState();
-    chartLines
-        .map(
-          (e) => checkers.add(
-            HphtChecker(false, e),
-          ),
-        )
-        .toList();
+
+    initialDate = DateTime.now();
+    initialFirstDate = DateTime(
+      initialDate!.year - 1,
+    );
+    initialLastDate = DateTime(
+      initialDate!.year + 1,
+      initialDate!.month,
+      initialDate!.day,
+    );
+    currentDate = DateTime.now();
+  }
+
+  @override
+  void dispose() {
+    _lastHaidController.dispose();
+    _longHaidController.dispose();
+
+    _longHaidFocus.dispose();
+    _submitFocus.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final Map<int, TableColumnWidth> tableColumnWidth = {
-      0: FractionColumnWidth(.24),
-      1: FractionColumnWidth(.04),
-    };
-
-    Account? account;
+    _onSubmitted() {
+      if (_formKey.currentState!.validate()) {
+        _longHaidFocus.dispose();
+        print("SUBMITTING");
+      } else {
+        print("VALUES CANNOT BE NULL");
+      }
+    }
 
     return BuildBodyWidget(
       appBar: KlinikAppBar(
-        title: "HPHT",
-        centerTitle: true,
+        title: "HPTH  Page",
       ),
-      persistentFooterButtons: [
-        CustomButton.defaultButton(
-          title: "Simpan",
-          titleSize: 18.0,
-          titleColor: Colors.white,
-          titleFontWeight: FontWeight.bold,
-          width: Core.getDefaultAppWidth(context),
-          height: 48.0,
-          onPressed: () => goBack(),
-        ),
-      ],
       body: Container(
-        padding: EdgeInsets.all(20.0),
-        color: Colors.white,
-        child: Column(
-          children: [
-            // _text(context, "text"),
-
-            Table(
-              border: TableBorder.all(
-                width: 0.0,
-                color: Colors.transparent,
+        padding: EdgeInsets.symmetric(
+          horizontal: 20.0,
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _sizedBox(),
+              _text(
+                "Kalender Kesuburan",
+                textAlign: TextAlign.center,
+                fontSize: 48.0,
+                fontWeight: FontWeight.w600,
               ),
-              columnWidths: tableColumnWidth,
-              children: [
-                TableRow(
-                  children: [
-                    _text(context, "Nama"),
-                    _text(context, " : "),
-                    BlocBuilder<AccountBloc, AccountState>(
-                      builder: (context, state) {
-                        if (state is AccountDetailLoaded) {
-                          account = state.account;
-                        } else if (state is AccountLoading) {
-                          return Container(
-                            height: 20.0,
-                            width: 20.0,
-                            alignment: Alignment.centerLeft,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 0.4,
-                            ),
-                          );
-                        }
+              _sizedBox(),
+              Text("Haid Terakhir :"),
+              Container(
+                margin: EdgeInsets.only(
+                  top: 8.0,
+                  bottom: 24.0,
+                ),
+                width: Core.getDefaultAppWidth(context) / 2.2,
+                child: CustomFormField(
+                  controller: _lastHaidController,
+                  hintText: "masukkan haid terakhir anda",
+                  textAlign: TextAlign.center,
+                  readOnly: true,
+                  onTap: () async {
+                    DateTime? result = await showDatePicker(
+                      context: context,
+                      initialDate: initialDate!,
+                      firstDate: initialFirstDate!,
+                      lastDate: initialLastDate!,
+                      currentDate: currentDate!,
+                      cancelText: "Cancel",
+                      confirmText: "Ok",
+                      helpText: "Select Your Birth Day Date",
+                      fieldHintText: "Bulan/Tanggal/Tahun",
+                      initialDatePickerMode: DatePickerMode.day,
+                      initialEntryMode: DatePickerEntryMode.calendarOnly,
+                      builder: (context, child) => child!,
+                    );
 
-                        if (account != null) {
-                          return _text(context, account!.fullName);
-                        } else {
-                          return _text(context, "");
-                        }
-                      },
-                    ),
-                  ],
+                    if (result != null) {
+                      setState(() {
+                        _lastHaidController.text = result.toString().todMMMMy();
+                        initialDate = result;
+                        formFocusNode(
+                          context,
+                          _longHaidFocus,
+                        );
+                      });
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null) {
+                      return "value tidak boleh kosong !";
+                    } else {
+                      return null;
+                    }
+                  },
                 ),
-                TableRow(
-                  children: [
-                    _text(context, "Tanggal"),
-                    _text(context, " : "),
-                    _text(
-                      context,
-                      " " + DateTime.now().toLocal().toString().todMMMMy(),
-                    ),
-                  ],
+              ),
+              Text("Lama Haid :"),
+              Container(
+                margin: EdgeInsets.only(
+                  top: 8.0,
+                  bottom: 24.0,
                 ),
-                TableRow(
-                  children: [
-                    _text(context, "Tempat"),
-                    _text(context, " : "),
-                    _text(context, " - "),
-                  ],
+                width: Core.getDefaultAppWidth(context) / 2.2,
+                child: CustomFormField(
+                  controller: _longHaidController,
+                  hintText: "masukkan haid terakhir anda",
+                  textAlign: TextAlign.center,
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.number,
+                  onFieldSubmitted: (p0) => formFocusNode(
+                    context,
+                    _submitFocus,
+                  ),
+                  validator: (value) {
+                    if (value == null) {
+                      return "value tidak boleh kosong !";
+                    } else {
+                      return null;
+                    }
+                  },
                 ),
-              ],
-            ),
-            SizedBox(
-              height: 32.0,
-            ),
-            _buildTable(context),
-          ],
+              ),
+              _sizedBox(),
+              Container(
+                margin: EdgeInsets.only(top: !textIsEmpty ? 0.0 : 32.0),
+                width: Core.getDefaultAppWidth(context),
+                child: CustomButton.defaultButton(
+                  focusNode: _submitFocus,
+                  title: "Hitung",
+                  titleSize: 18.0,
+                  titleColor: Colors.white,
+                  buttonDefaultColor: Theme.of(context).primaryColor,
+                  titleFontWeight: FontWeight.bold,
+                  width: Core.getDefaultAppWidth(context),
+                  height: 48.0,
+                  onPressed: _onSubmitted,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    );
-  }
-
-  ///Build untuk menampilkan `Tabel` keterangan `Index Masa Tubuh`, baik itu
-  ///sudah ideal, kurang atau over.
-  Widget _buildTable(BuildContext context) {
-    final tableSubtitleSymmetricBorderSide = BorderSide(
-      color: Colors.black54,
-      width: 1.0,
-    );
-    final tableSubtitleBorderSidefromLRTB = BorderSide(
-      color: Colors.black,
-      width: 1.0,
-    );
-
-    final Map<int, TableColumnWidth> tableColumnWidth = {
-      0: FractionColumnWidth(.40),
-      // 1: FractionColumnWidth(.34),
-    };
-
-    final tableRowCellsMargin = EdgeInsets.all(8.0);
-
-    print(checkers //check apakah checker berhasil.
-        .map(
-          (e) => e.isChecked,
-        )
-        .toList(
-          growable: false,
-        ));
-
-    return Column(
-      children: [
-        Table(
-          border: TableBorder.all(
-            color: Colors.black,
-            width: 1.0,
-          ),
-          columnWidths: tableColumnWidth,
-          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-          children: [
-            TableRow(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.06),
-              ),
-              children: [
-                Container(
-                  margin: tableRowCellsMargin,
-                  child: _text(
-                    context,
-                    "HPHT",
-                    fontSize: 16.0,
-                  ),
-                ),
-                Container(
-                  margin: tableRowCellsMargin,
-                  child: Column(
-                    children: [
-                      _text(
-                        context,
-                        "Trimester 1",
-                        fontSize: 16.0,
-                      ),
-                      _text(
-                        context,
-                        "Periksa",
-                        fontSize: 16.0,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        Table(
-          columnWidths: tableColumnWidth,
-          defaultVerticalAlignment: TableCellVerticalAlignment.top,
-          border: TableBorder(
-            verticalInside: tableSubtitleSymmetricBorderSide,
-            horizontalInside: tableSubtitleSymmetricBorderSide,
-            right: tableSubtitleBorderSidefromLRTB,
-            left: tableSubtitleBorderSidefromLRTB,
-            bottom: tableSubtitleBorderSidefromLRTB,
-          ),
-          children: checkers
-              .map(
-                (e) => TableRow(
-                  key: ValueKey(e),
-                  children: [
-                    Container(
-                      height: 32.0,
-                      margin: tableRowCellsMargin,
-                      child: _text(
-                        context,
-                        e.value,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    Container(
-                      margin: tableRowCellsMargin,
-                      child: Checkbox(
-                        value: e.isChecked,
-                        checkColor:
-                            e.isChecked ? Color(0xFFFFFFFF) : Colors.grey,
-                        onChanged: (onChanged) {
-                          setState(() {
-                            e.isChecked = !e.isChecked;
-                            print(checkers[checkers.indexOf(e)].isChecked);
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              )
-              .toList(),
-        ),
-      ],
     );
   }
 
   Widget _text(
-    BuildContext context,
     String? text, {
+    TextAlign? textAlign,
     double? fontSize,
+    FontWeight? fontWeight,
+    Color? color,
   }) =>
       Text(
         "$text",
-        textAlign: TextAlign.left,
+        textAlign: textAlign ?? TextAlign.left,
         style: TextStyle(
+          color: color ?? ColorHelper.fromHex("#240B1D"),
           fontSize: fontSize ?? 18.0,
-          color: Theme.of(context).textTheme.bodyText1!.color,
+          fontWeight: fontWeight ?? FontWeight.normal,
         ),
       );
-}
 
-///model untuk `checkbox` menu **[HPHT]**
-class HphtChecker {
-  late bool isChecked;
-  final String value;
-
-  HphtChecker(this.isChecked, this.value);
+  Widget _sizedBox({
+    double? height,
+  }) =>
+      SizedBox(
+        height: height ?? 24.0,
+      );
 }

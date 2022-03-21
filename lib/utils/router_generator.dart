@@ -9,6 +9,7 @@ import 'package:klinik/core/app_route.dart';
 import 'package:klinik/models/account.dart';
 import 'package:klinik/models/article.dart';
 import 'package:klinik/models/event.dart';
+import 'package:klinik/models/history.dart';
 import 'package:klinik/models/video.dart';
 import 'package:klinik/ui/home.dart';
 import 'package:klinik/ui/screen/article/article_detail_page.dart';
@@ -22,6 +23,7 @@ import 'package:klinik/ui/screen/doctor/hpht_doctor/hpht_doctor_page.dart';
 import 'package:klinik/ui/screen/doctor/login_doctor/login_doctor_page.dart';
 import 'package:klinik/ui/screen/chats/chat_detail_page.dart';
 import 'package:klinik/ui/screen/history/history_page.dart';
+import 'package:klinik/ui/screen/history/history_preview_page.dart';
 import 'package:klinik/ui/screen/home/home_menu_item_page.dart';
 import 'package:klinik/ui/screen/forgot_password/forgot_password.dart';
 import 'package:klinik/ui/screen/forgot_password/verify_forgot_password.dart';
@@ -122,6 +124,20 @@ class RouterGenerator {
       case AppRoute.history:
         return MaterialPageRoute(
           builder: (context) => const HistoryPage(),
+        );
+      case AppRoute.historyPreviewPage:
+        final item = settings.arguments as History;
+        print(item);
+
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider<AccountBloc>(
+            create: (context) => AccountBloc(
+              klinikBloc: klinikBloc,
+            )..add(
+                LoadDetailAccount(),
+              ),
+            child: HistoryPreviewPage(item: item),
+          ),
         );
       case AppRoute.bodyMassIndex:
         var account = settings.arguments as Account;

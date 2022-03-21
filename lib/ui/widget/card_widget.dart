@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 Widget cardWidget(
         {EdgeInsetsGeometry? padding,
         EdgeInsetsGeometry? margin,
+        BorderRadiusGeometry? borderRadius,
         Color? backgroundColor,
         required Widget child,
         VoidCallback? onTap}) =>
@@ -10,7 +11,7 @@ Widget cardWidget(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: borderRadius ?? BorderRadius.circular(16.0),
           color: backgroundColor ?? Colors.white,
           boxShadow: const [
             BoxShadow(

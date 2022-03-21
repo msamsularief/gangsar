@@ -29,7 +29,7 @@ class _SliderWidgetState extends State<SliderWidget> {
       widget.images!.map((e) {
         String videoUrl = VideoHelper.getVideoThumbnail(e);
         listItems.add(videoUrl);
-      }).toList();
+      }).toList(growable: false);
       setState(() {
         images = listItems;
       });

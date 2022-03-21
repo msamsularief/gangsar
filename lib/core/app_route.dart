@@ -21,6 +21,7 @@ class AppRoute {
   static const booking = "/booking";
   static const chooseDoctor = "/choose_doctor";
   static const hpht = "/hpht";
+  static const historyPreviewPage = "/history_preview_page";
 
   //----------------------------------------------------> DOCTER
   static const hphtDoctor = "/hpht_doctor";

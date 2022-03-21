@@ -1,68 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:klinik/bloc/account/account.dart';
-import 'package:klinik/core/app_route.dart';
-import 'package:klinik/core/core.dart';
 import 'package:klinik/helper/date_formatter.dart';
 import 'package:klinik/models/account.dart';
-import 'package:klinik/models/event.dart';
+import 'package:klinik/models/history.dart';
 import 'package:klinik/models/hpht_checker.dart';
 import 'package:klinik/ui/widget/build_body_widget.dart';
-import 'package:klinik/ui/widget/custom_button.dart';
 import 'package:klinik/ui/widget/klinik_appbar.dart';
 
-class HphtDoctorPage extends StatefulWidget {
-  final Event item;
-  const HphtDoctorPage({Key? key, required this.item}) : super(key: key);
-
-  @override
-  _HphtDoctorPageState createState() => _HphtDoctorPageState();
-}
-
-class _HphtDoctorPageState extends State<HphtDoctorPage> {
-  late Event item;
-  bool isChecked = false;
-  List<HphtChecker> checkers = [];
-
-  final List<String> chartLines = [
-    "Timbang",
-    "Ukur Lingkar Lengan Atas",
-    "Tekanan Darah",
-    "Periksa Tinggi Rahim",
-    "Periksa Letak dan Denyut Jantung Janin",
-    "Status dan Imunisasi Tetanus",
-    "Konseling",
-    "Skrining Dokter",
-    "Tablet Tambah Darah",
-    "Test Lab Hemoglobin (Hb)",
-    "Test Golongan Darah",
-    "Test Lab Protein Urine",
-    "Test Lab Gula Darah",
-    "PPIA",
-    "Tata Laksana Kasus",
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    item = widget.item;
-    chartLines
-        .map(
-          (e) => checkers.add(
-            HphtChecker(
-              chartLines.indexOf(e).toString(),
-              e,
-              false,
-            ),
-          ),
-        )
-        .toList(growable: false);
-  }
+class HistoryPreviewPage extends StatelessWidget {
+  final History item;
+  const HistoryPreviewPage({Key? key, required this.item}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final Map<int, TableColumnWidth> tableColumnWidth = {
-      0: FractionColumnWidth(.24),
+      0: FractionColumnWidth(.28),
       1: FractionColumnWidth(.04),
     };
 
@@ -70,20 +23,9 @@ class _HphtDoctorPageState extends State<HphtDoctorPage> {
 
     return BuildBodyWidget(
       appBar: KlinikAppBar(
-        title: "HPHT",
+        title: "Riwayat Pemeriksaan",
         centerTitle: true,
       ),
-      persistentFooterButtons: [
-        CustomButton.defaultButton(
-          title: "Simpan",
-          titleSize: 18.0,
-          titleColor: Colors.white,
-          titleFontWeight: FontWeight.bold,
-          width: Core.getDefaultAppWidth(context),
-          height: 48.0,
-          onPressed: () => goBack(true),
-        ),
-      ],
       body: Container(
         padding: EdgeInsets.all(20.0),
         color: Colors.white,
@@ -100,7 +42,7 @@ class _HphtDoctorPageState extends State<HphtDoctorPage> {
               children: [
                 TableRow(
                   children: [
-                    _text(context, "Nama"),
+                    _text(context, "Nama Pasien"),
                     _text(context, " : "),
                     BlocBuilder<AccountBloc, AccountState>(
                       builder: (context, state) {
@@ -120,7 +62,7 @@ class _HphtDoctorPageState extends State<HphtDoctorPage> {
                         if (account != null) {
                           return _text(context, account!.fullName);
                         } else {
-                          return _text(context, item.title);
+                          return _text(context, "-");
                         }
                       },
                     ),
@@ -132,7 +74,17 @@ class _HphtDoctorPageState extends State<HphtDoctorPage> {
                     _text(context, " : "),
                     _text(
                       context,
-                      item.subtitle.todMMMMy(),
+                      item.timestamp.todMMMMy(),
+                    ),
+                  ],
+                ),
+                TableRow(
+                  children: [
+                    _text(context, "Jenis"),
+                    _text(context, " : "),
+                    _text(
+                      context,
+                      item.description,
                     ),
                   ],
                 ),
@@ -158,6 +110,75 @@ class _HphtDoctorPageState extends State<HphtDoctorPage> {
   ///Build untuk menampilkan `Tabel` keterangan `Index Masa Tubuh`, baik itu
   ///sudah ideal, kurang atau over.
   Widget _buildTable(BuildContext context) {
+    final List<String> chartLines = [
+      "Timbang",
+      "Ukur Lingkar Lengan Atas",
+      "Tekanan Darah",
+      "Periksa Tinggi Rahim",
+      "Periksa Letak dan Denyut Jantung Janin",
+      "Status dan Imunisasi Tetanus",
+      "Konseling",
+      "Skrining Dokter",
+      "Tablet Tambah Darah",
+      "Test Lab Hemoglobin (Hb)",
+      "Test Golongan Darah",
+      "Test Lab Protein Urine",
+      "Test Lab Gula Darah",
+      "PPIA",
+      "Tata Laksana Kasus",
+    ];
+
+    final List<HphtChecker> checkers = [];
+
+    for (int i = 0; i < chartLines.length; i++) {
+      if (i == 4 || i == 5 || i == 7) {
+        checkers.add(
+          HphtChecker(
+            i.toString(),
+            chartLines[i],
+            true,
+          ),
+        );
+      } else {
+        checkers.add(
+          HphtChecker(
+            i.toString(),
+            chartLines[i],
+            false,
+          ),
+        );
+      }
+    }
+
+    // chartLines.map((e) {
+    //   int index = chartLines.indexOf(e);
+    //   if (index == 4 && index == 5 && index == 7) {
+    //     checkers.add(
+    //       HphtChecker(
+    //         chartLines.indexOf(e).toString(),
+    //         e,
+    //         true,
+    //       ),
+    //     );
+    //   } else {
+    //     checkers.add(
+    //       HphtChecker(
+    //         chartLines.indexOf(e).toString(),
+    //         e,
+    //         false,
+    //       ),
+    //     );
+    //   }
+    // }).toList(
+    //   growable: false,
+    // );
+
+    // checkers.map((e) {
+    //   final value = [e.copy(isChecked: true)];
+    //   checkers.replaceRange(checkers.indexOf(e), checkers.indexOf(e), value);
+    //   checkers.removeAt(checkers.indexOf(e));
+    // }).toList();
+
     final tableSubtitleSymmetricBorderSide = BorderSide(
       color: Colors.black54,
       width: 1.0,
@@ -168,7 +189,7 @@ class _HphtDoctorPageState extends State<HphtDoctorPage> {
     );
 
     final Map<int, TableColumnWidth> tableColumnWidth = {
-      0: FractionColumnWidth(.40),
+      0: FractionColumnWidth(.70),
       // 1: FractionColumnWidth(.34),
     };
 
@@ -252,28 +273,20 @@ class _HphtDoctorPageState extends State<HphtDoctorPage> {
                     ),
                     Container(
                       margin: tableRowCellsMargin,
-                      child: Checkbox(
-                        value: e.isChecked,
-                        checkColor:
-                            e.isChecked ? Color(0xFFFFFFFF) : Colors.grey,
-                        onChanged: (onChanged) {
-                          setState(() {
-                            final value = [e.copy(isChecked: onChanged)];
-                            checkers.replaceRange(
-                              checkers.indexOf(e),
-                              checkers.indexOf(e),
-                              value,
-                            );
-                            checkers.removeAt(checkers.indexOf(e));
-                            // print(checkers[checkers.indexOf(e)].isChecked);
-                          });
-                        },
+                      child: Icon(
+                        e.isChecked
+                            ? Icons.check_box_rounded
+                            : Icons.check_box_outline_blank_rounded,
+                        size: 24.0,
+                        color: e.isChecked
+                            ? Theme.of(context).primaryColor
+                            : Colors.grey,
                       ),
                     ),
                   ],
                 ),
               )
-              .toList(),
+              .toList(growable: false),
         ),
       ],
     );
