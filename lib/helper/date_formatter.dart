@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:klinik/core/locale_formater.dart';
 
 extension DateFormatter on String {
   ///Untuk menampilkan tanggal berformat `'d MMMM y'`
@@ -13,7 +14,10 @@ extension DateFormatter on String {
   ///```
   String todMMMMy() {
     final DateTime dateTime = DateTime.parse(this);
-    final DateFormat formatter = DateFormat('d MMMM y', "id_ID");
+    final DateFormat formatter = DateFormat(
+      'd MMMM y',
+      LocalFormatter.indonesian,
+    );
 
     return formatter.format(dateTime);
   }
@@ -30,7 +34,33 @@ extension DateFormatter on String {
   ///```
   String towdMMMMy() {
     final DateTime dateTime = DateTime.parse(this);
-    final DateFormat formatter = DateFormat('EEEE, d MMMM y', "id_ID");
+    final DateFormat formatter = DateFormat(
+      'EEEE, d MMMM y',
+      LocalFormatter.indonesian,
+    );
+
+    return formatter.format(dateTime);
+  }
+
+  ///Untuk menampilkan nama bulan dalam format Indonesia
+  ///```dart
+  ///('id_ID')
+  ///```
+  String toMMMM() {
+    final DateTime dateTime = DateTime.parse(this);
+    final DateFormat formatter = DateFormat.MMMM(
+      LocalFormatter.indonesian,
+    );
+
+    return formatter.format(dateTime);
+  }
+
+  ///Untuk menampilkan tanggal saja
+  String toD() {
+    final DateTime dateTime = DateTime.parse(this);
+    final DateFormat formatter = DateFormat.d(
+      LocalFormatter.indonesian,
+    );
 
     return formatter.format(dateTime);
   }

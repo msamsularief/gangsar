@@ -6,6 +6,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:klinik/api/auth.dart';
 import 'package:klinik/core/app_route.dart';
+import 'package:klinik/core/locale_formater.dart';
 import 'package:klinik/helper/color_helper.dart';
 import 'package:klinik/models/app_info.dart';
 import 'package:klinik/ui/screen/splash/splash.dart';
@@ -21,7 +22,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   KlinikSystemChrome.preferredOrientations;
   KlinikSystemChrome.uiOverlayStyle;
-  await initializeDateFormatting('id_ID', null).then((_) => true);
+  await initializeDateFormatting(
+    LocalFormatter.indonesian,
+    null,
+  ).then((_) => true);
   dotenv.load(fileName: ".env"); //LOAD ENV FILE
   firebaseApp = await Firebase.initializeApp();
 

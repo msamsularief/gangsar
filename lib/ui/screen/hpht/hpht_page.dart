@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:klinik/core/app_route.dart';
 import 'package:klinik/core/core.dart';
 import 'package:klinik/helper/color_helper.dart';
 import 'package:klinik/helper/date_formatter.dart';
 import 'package:klinik/ui/widget/build_body_widget.dart';
+import 'package:klinik/ui/widget/calendar_picker.dart';
 import 'package:klinik/ui/widget/custom_button.dart';
 import 'package:klinik/ui/widget/custom_form_field.dart';
-import 'package:klinik/ui/widget/form_focus_node.dart';
 import 'package:klinik/ui/widget/klinik_appbar.dart';
 
 class HphtPage extends StatefulWidget {
@@ -17,7 +18,7 @@ class HphtPage extends StatefulWidget {
 
 class _HphtPageState extends State<HphtPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _lastHaidController = TextEditingController();
+  late TextEditingController _lastHaidController = TextEditingController();
   final TextEditingController _longHaidController = TextEditingController();
   final FocusNode _longHaidFocus = FocusNode();
   final FocusNode _submitFocus = FocusNode();
@@ -58,17 +59,27 @@ class _HphtPageState extends State<HphtPage> {
   @override
   Widget build(BuildContext context) {
     _onSubmitted() {
-      if (_formKey.currentState!.validate()) {
-        _longHaidFocus.dispose();
+      if (_lastHaidController.text.isNotEmpty &&
+          _longHaidController.text.isNotEmpty) {
+        textIsEmpty = false;
         print("SUBMITTING");
+
+        navigateTo(AppRoute.hphtDetailPage, arguments: [
+          initialDate.toString(),
+          _longHaidController.text,
+        ]);
+
+        print("SUBMITTED");
       } else {
         print("VALUES CANNOT BE NULL");
+        textIsEmpty = true;
       }
     }
 
     return BuildBodyWidget(
       appBar: KlinikAppBar(
-        title: "HPTH  Page",
+        title: "HPTH",
+        centerTitle: true,
       ),
       body: Container(
         padding: EdgeInsets.symmetric(
@@ -87,42 +98,52 @@ class _HphtPageState extends State<HphtPage> {
                 fontWeight: FontWeight.w600,
               ),
               _sizedBox(),
-              Text("Haid Terakhir :"),
+              Text("Haid Terakhir  :"),
               Container(
                 margin: EdgeInsets.only(
                   top: 8.0,
                   bottom: 24.0,
                 ),
-                width: Core.getDefaultAppWidth(context) / 2.2,
+                width: Core.getDefaultAppWidth(context) / 2.0,
                 child: CustomFormField(
                   controller: _lastHaidController,
                   hintText: "masukkan haid terakhir anda",
                   textAlign: TextAlign.center,
                   readOnly: true,
                   onTap: () async {
-                    DateTime? result = await showDatePicker(
+                    DateTime? result = await showModalBottomSheet(
                       context: context,
-                      initialDate: initialDate!,
-                      firstDate: initialFirstDate!,
-                      lastDate: initialLastDate!,
-                      currentDate: currentDate!,
-                      cancelText: "Cancel",
-                      confirmText: "Ok",
-                      helpText: "Select Your Birth Day Date",
-                      fieldHintText: "Bulan/Tanggal/Tahun",
-                      initialDatePickerMode: DatePickerMode.day,
-                      initialEntryMode: DatePickerEntryMode.calendarOnly,
-                      builder: (context, child) => child!,
+                      isScrollControlled: true,
+                      enableDrag: true,
+                      isDismissible: true,
+                      constraints: BoxConstraints(
+                        maxHeight: Core.getDefaultBodyHeight(context) / 1.32,
+                      ),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(16.0),
+                          topRight: Radius.circular(16.0),
+                        ),
+                      ),
+                      builder: (context) {
+                        return Container(
+                          padding: const EdgeInsets.only(
+                            top: 16.0,
+                          ),
+                          child: CalendarPicker(
+                            isRangedPicker: false,
+                            selectedDay: initialDate,
+                          ),
+                        );
+                      },
                     );
 
                     if (result != null) {
+                      print(result);
+
                       setState(() {
-                        _lastHaidController.text = result.toString().todMMMMy();
                         initialDate = result;
-                        formFocusNode(
-                          context,
-                          _longHaidFocus,
-                        );
+                        _lastHaidController.text = result.toString().todMMMMy();
                       });
                     }
                   },
@@ -135,23 +156,20 @@ class _HphtPageState extends State<HphtPage> {
                   },
                 ),
               ),
-              Text("Lama Haid :"),
+              Text("Lama Haid (hari) :"),
               Container(
                 margin: EdgeInsets.only(
                   top: 8.0,
                   bottom: 24.0,
                 ),
-                width: Core.getDefaultAppWidth(context) / 2.2,
+                width: Core.getDefaultAppWidth(context) / 2.0,
                 child: CustomFormField(
                   controller: _longHaidController,
-                  hintText: "masukkan haid terakhir anda",
+                  hintText: "masukkan lama haid terakhir anda",
                   textAlign: TextAlign.center,
-                  textInputAction: TextInputAction.next,
+                  textInputAction: TextInputAction.done,
                   keyboardType: TextInputType.number,
-                  onFieldSubmitted: (p0) => formFocusNode(
-                    context,
-                    _submitFocus,
-                  ),
+                  onFieldSubmitted: (p0) => _onSubmitted(),
                   validator: (value) {
                     if (value == null) {
                       return "value tidak boleh kosong !";

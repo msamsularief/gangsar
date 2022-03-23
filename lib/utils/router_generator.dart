@@ -27,6 +27,7 @@ import 'package:klinik/ui/screen/history/history_preview_page.dart';
 import 'package:klinik/ui/screen/home/home_menu_item_page.dart';
 import 'package:klinik/ui/screen/forgot_password/forgot_password.dart';
 import 'package:klinik/ui/screen/forgot_password/verify_forgot_password.dart';
+import 'package:klinik/ui/screen/hpht/hpht_detail_page.dart';
 import 'package:klinik/ui/screen/hpht/hpht_page.dart';
 import 'package:klinik/ui/screen/hpl/hpl_page.dart';
 import 'package:klinik/ui/screen/login/login_page.dart';
@@ -35,6 +36,7 @@ import 'package:klinik/ui/screen/profile/profile_page.dart';
 import 'package:klinik/ui/screen/register/register_page.dart';
 import 'package:klinik/ui/screen/role/selec_role.dart';
 import 'package:klinik/ui/screen/video/video_page.dart';
+import 'package:klinik/ui/widget/hpht/hpht_calendar_picker.dart';
 import 'package:klinik/ui/widget/klinik_appbar.dart';
 import 'package:klinik/ui/widget/video_player/video_player.dart';
 import 'package:klinik/utils/route_arguments.dart';
@@ -202,9 +204,21 @@ class RouterGenerator {
             child: HphtPage(),
           ),
         );
+
+      case AppRoute.hphtDetailPage:
+        final data = settings.arguments as List<String>;
+        final date = DateTime.parse(data.first);
+        print(data);
+
+        return MaterialPageRoute(
+          builder: (context) => HphtDetailPage(
+            inDays: int.parse(data.last),
+            date: date,
+          ),
+        );
       case AppRoute.booking:
         return MaterialPageRoute(
-          builder: (context) => BookingPage(),
+          builder: (context) => const BookingPage(),
         );
       case AppRoute.chooseDoctor:
         List<String> items = settings.arguments as List<String>;
