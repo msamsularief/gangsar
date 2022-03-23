@@ -22,7 +22,6 @@ class AppRoute {
   static const chooseDoctor = "/choose_doctor";
   static const hpht = "/hpht";
   static const historyPreviewPage = "/history_preview_page";
-  static const hphtCalendarPicker = "/hpht_calendar_picker";
   static const hphtDetailPage = "/hpht_detail_page";
 
   //----------------------------------------------------> DOCTER

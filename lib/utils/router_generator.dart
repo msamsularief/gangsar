@@ -36,7 +36,6 @@ import 'package:klinik/ui/screen/profile/profile_page.dart';
 import 'package:klinik/ui/screen/register/register_page.dart';
 import 'package:klinik/ui/screen/role/selec_role.dart';
 import 'package:klinik/ui/screen/video/video_page.dart';
-import 'package:klinik/ui/widget/hpht/hpht_calendar_picker.dart';
 import 'package:klinik/ui/widget/klinik_appbar.dart';
 import 'package:klinik/ui/widget/video_player/video_player.dart';
 import 'package:klinik/utils/route_arguments.dart';
@@ -187,12 +186,7 @@ class RouterGenerator {
             videoData: videoData,
           ),
         );
-      // return MaterialPageRoute(
-      //   builder: (context) => VideoPlayerSecond(
-      //     videoId: videoId,
-      //     video: videoData,
-      //   ),
-      // );
+
       case AppRoute.hpht:
         return MaterialPageRoute(
           builder: (context) => BlocProvider<AccountBloc>(
